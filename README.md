@@ -1,5 +1,8 @@
 # RouteGuesser
 
+<!-- TODO -->
+Find the (image) of the map that we can parse into a datastructure
+Figure out a datastructure that we are going to use
 
 
 ## Getting started
