@@ -1,0 +1,54 @@
+{
+"type": "FeatureCollection",
+"features": [
+    {
+    "type": "Feature",
+    "properties": {
+        "@id": "node/30680610"
+        },
+    "geometry": {
+        "type": "Point",
+        "coordinates": [4.5125131, 52.1751919]
+        },
+    "id": "node/30680610"
+    },
+    {
+    "type": "Feature",
+    "properties": {
+        "@id": "node/30680611"
+        },
+    "geometry": {
+        "type": "Point",
+        "coordinates": [4.5125131, 52.1752929]
+        },
+    "id": "node/30680611"
+    },
+    {
+        "type": "Feature",
+        "properties": {
+            "@id": "way/7435693",
+            "cyclestreet": "yes",
+            "highway": "residential",
+            "maxspeed": "30",
+            "name": "Willem de Zwijgerlaan",
+            "name:etymology:wikidata": "Q78454",
+            "surface": "paving_stones",
+            "zone:traffic": "NL:urban"
+        },
+        "geometry": {
+            "type": "LineString",
+            "coordinates": [
+                [4.4987475, 52.1682483],
+                [4.4988483, 52.1682315],
+                [4.4993214, 52.1681951],
+                [4.4995077, 52.1681836],
+                [4.4996376, 52.1681756],
+                [4.5023609, 52.1680005],
+                [4.5025039, 52.1679913],
+                [4.5026244, 52.1679829]
+            ]
+        },
+        "id": "way/7435693"
+    }
+    ]
+}
