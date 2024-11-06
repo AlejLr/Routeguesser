@@ -1,6 +1,6 @@
 $(document).ready(function() {
     // Initialise map
-    let map = L.map('map').setView([52.16, 4.49], 14);
+    let map = L.map('map', {maxZoom: 19, minZoom:15, maxBounds: [[52.1, 4.455],[52.5, 4.6]], zoom: 17, center: [52.1581218,4.4855674]});
     
     // // Google streets map
     // let googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
@@ -11,10 +11,10 @@ $(document).ready(function() {
 
     // Show map layer
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    bounds: [[52,4],[52.3,5]]
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    // maxBoundsViscosity: 1.0
     }).addTo(map);  
+    // map.fitBounds([[52,4.3],[52.2,4.6]])
 
     // Add start and end positions and put their markers
     let startPos = [52.1581218,4.4855674],
