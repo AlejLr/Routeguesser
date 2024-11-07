@@ -1,6 +1,6 @@
 $(document).ready(function() {
     // Initialise map
-    let map = L.map('map', {maxZoom: 19, minZoom:15, maxBounds: [[52.1, 4.455],[52.5, 4.6]], zoom: 17, center: [52.1581218,4.4855674]});
+    let map = L.map('map', {maxZoom: 19, minZoom:14, maxBounds: [[52.1, 4.455],[52.5, 4.6]], zoom: 17, center: [52.1581218,4.4855674]});
     
     // // Google streets map
     // let googleStreets = L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',{
