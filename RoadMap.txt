@@ -1,4 +1,4 @@
-!!! Weeks go from Tuesday to Monday, being Monday the last day of the weekly schedule plan.
+!! Weeks go from Tuesday to Monday, being Monday the last day of the weekly schedule plan.
 
 Week 1 - Map and basic Frontend 
 
