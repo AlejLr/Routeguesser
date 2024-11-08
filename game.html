@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeogesserGame</title>
+
+    <link rel="stylesheet" href="styles.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+</head>
+
+<body>
+    <fieldset id="menu">
+        <legend>
+            <h1>Routeguesser</h1>
+        </legend>
+
+        <div id="routeNumberDiv">
+            <label for="routeNumber">Number of routes (between 1 and 10):
+                <input type="number" id="routeNumber" name="routeNumber" placeholder="3 default"
+                    min=1 max=10>
+            </label>
+        </div>
+        <div id="difficultyDiv">
+            <label for="difficulty">Difficulty</label>
+            <div id="difficultyButtons">
+                <button class ="difButton" type="button" id="easy" name="difficulty" value="0"><strong>Easy</strong></button>
+
+                <button class ="difButton" type="button" id="medium" name="difficulty" value="1"><strong>Medium</strong></button>
+
+                <button class ="difButton" type="button" id="hard" name="difficulty" value="2"><strong>Hard</strong></button>
+            </div>
+        </div>
+    </fieldset>
+
+    <div id="map"></div>
+    <div id="undoScore">
+        <p id="score">Score: <strong><span id = "scoreText">0</span></strong></p>
+        <button id="undo">Undo</button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+    <script src="mapScript.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
