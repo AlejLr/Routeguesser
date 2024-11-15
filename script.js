@@ -8,10 +8,13 @@ const mediumButton = document.querySelector('#medium');
 const hardButton = document.querySelector('#hard');
 const menu = document.querySelector('#menu');
 const routeNumber = document.querySelector('#routeNumber');
+const resetButton = document.querySelector('#reset')
 
 easyButton.onclick = setDifficultyEasy;
 mediumButton.onclick = setDifficultyMedium;
 hardButton.onclick = setDifficultyHard;
+resetButton.onclick = reset;
+
 routeNumber.addEventListener('input', updateRoutesNum);
 
 function setDifficultyEasy() {
@@ -27,6 +30,12 @@ function setDifficultyMedium() {
 function setDifficultyHard() {
     difficulty = "hard";
     menu.style.display = "none";
+}
+
+function reset() {
+    console.log("Resetting. Work in progress")
+    path = [startMarker.getLatLng()]
+    polyline.setLatLngs(path);
 }
 
 function updateRoutesNum() {
