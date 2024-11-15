@@ -1,23 +1,67 @@
-"""
-rough framework for the main file of the project
+import Map
+import graph_reader as gr
+from Flask import Flask, request, jsonify
+from flask_cors import CORS
 
-"""
+app = Flask(__name__)
+CORS(app)
 
-def send_neighbours():
+MIN_DISTANCE = 5
+
+@app.route('/main', methods=['POST'])
+def main():
     """
-    calls generate inputs and sends to the UI a geojson file with them
+    processes the inputs from the webpage
     """
-    pass
+    data = request.get_json()
+    if data["type"] == "start":
+        return send_start(data)
+    elif data["type"] == "neighbours":
+        return send_neighbours(data)
+    elif data["type"] == "end":
+        return send_score_and_path(data)
     
+    return jsonify({"error" : "The data is not a geoJSON or the format is invalid"}), 400
 
-def send_score():
-    """
-    sends the score to the UI in a geojson file
-    """
-    pass
-
-def send_start():
+def send_start(data):
     """
     sends the start, end and blocked nodes to the UI in a geojson file
     """
-    pass
+    map = Map(gr.GeoGraph("data/roads.geojson"))
+    data["difficulty"] = map.difficulty
+    startend = map.startend
+    blocked_nodes = map.generate_blocked_nodes()
+    neighbours = map.generate_neighbours(5)
+    optimal_paths = map.optimal_path
+    return jsonify({"startend" : startend, "blocked nodes": blocked_nodes, "neighbours": neighbours, "optimal path" :  optimal_paths})
+
+def send_neighbours(data):
+    """
+    calls generate inputs and sends to the UI a geojson file with them
+    """
+    # if "undo" in data.keys():
+    #     return jsonify({"error": "The undo function is not implemented yet"}), 400
+    
+    neighbours = map.generate_neighbours(MIN_DISTANCE)
+    map.process_inputs(data["current"])
+    return jsonify({"neighbours": neighbours})
+
+def send_score_and_path(data):
+    """
+    sends the score to the UI in a geojson file
+    """
+    map.process_inputs(data["current"])
+    return jsonify({"paths": optimal_paths})
+
+
+if __name__ == "__main__":
+    while True:
+        app.run(debug=True)
+        data = request.get_json()
+        if data["type"] == "end":
+            break
+
+# Graph = gr.GeoGraph("map_complex.geojson")
+# print(Graph.G.nodes)
+# Map = Map.Map(Graph)
+# print(Map.generate_start_end(1000))
