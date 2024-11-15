@@ -16,7 +16,7 @@ class Map:
         self.difficulty = 10
         self.number_of_blocked_nodes = 0
         self.blocked_roads = self.generate_blocked_roads(self.difficulty)
-        self.score = 0
+        # self.score = 0
         self.startend = self.generate_start_end(1000)
         self.current_pos = self.start
         self.chosen_path = [self.start]
@@ -40,7 +40,7 @@ class Map:
     def generate_start_end(self, min_distance):
         """generate a start and end node randomly from the graph, which must have a minimum distance between them
         rtype:  dict(string, G.node)
-        like {"start": , "end": G.node}
+        like {"start": G.node, "end": G.node}
         """
         #TODO
         # also here, you can access nodes like this
@@ -63,17 +63,26 @@ class Map:
         """
         generate an optimal path(s) between start and end
         returns: dict of nodes (which contain coordinates) and their scores, the score being the value (length of the path for now)
-        rtype: dict(set(G.node), int)
+        rtype: dict(list(G.node), int)
         """
         #TODO
         pass
 
     def generate_neighbours(self, min_distance):
         """
-        return graph edges based on current
-        for a curve, we want send all of the intermediate nodes
-        The key is the node we want the user to go to, the value (optional) for a curved road is the intermediate nodes
-        rtype: dict(G.node, set(G.node))
+        Generates a dictionary of neighbouring nodes for each node in the graph.
+
+        For each node in the graph, this method finds all neighbouring nodes that are at least `min_distance` away.
+        The result is a dictionary where each key is a node, and the value is a tuple containing a list of neighbouring nodes
+        and the count of those neighbours.
+
+        Args:
+        min_distance (int): The minimum distance required between nodes to be considered neighbours.
+
+        Returns:
+        dict: A dictionary where the keys are nodes and the values are tuples. Each tuple contains a list of neighbouring nodes
+              and an integer representing the distance to the chosen neighbour.
+        rtype: dict(G.node, tuple(list(G.node), int))
         """
         #TODO
         pass
@@ -83,8 +92,8 @@ class Map:
         increment the score, changes the current_pos
         """
         self.current_pos = next_node
-        if next_node not in self.path:
-            self.score += self.calculate_cartesian_distance(self.current_pos, self.next_node)
+        # if next_node not in self.path:
+        #     self.score += self.calculate_cartesian_distance(self.current_pos, self.next_node)
 
     
     def calculate_cartesian_distance(self, node1, node2):
