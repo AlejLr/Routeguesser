@@ -1,8 +1,8 @@
-let score = 0;
+let distance = 0;
 let difficulty = "medium";
 let routesNum = 3;
 
-const scoreText = document.querySelector('#scoreText');
+const scoreText = document.querySelector('#distanceText');
 const easyButton = document.querySelector('#easy');
 const mediumButton = document.querySelector('#medium');
 const hardButton = document.querySelector('#hard');
