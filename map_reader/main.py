@@ -27,7 +27,7 @@ def send_start(data):
     """
     sends the start, end and blocked nodes to the UI in a geojson file
     """
-    map = Map(gr.GeoGraph("data/roads.geojson"))
+    map = Map(gr.GeoGraph("map_complex.geojson"))
     data["difficulty"] = map.difficulty
     startend = map.startend
     blocked_nodes = map.generate_blocked_nodes()
