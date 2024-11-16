@@ -21,11 +21,11 @@ def main():
     elif data["type"] == "end":
         return send_score_and_path(data)
     
-    return jsonify({"error" : "The data is not a geoJSON or the format is invalid"}), 400
+    return jsonify({"error" : "The data is not a JSON or the format is invalid"}), 400
 
 def send_start(data):
     """
-    sends the start, end and blocked nodes to the UI in a geojson file
+    sends the start, end and blocked nodes to the UI in a JSON file
     """
     map = Map(gr.GeoGraph("map_complex.geojson"))
     data["difficulty"] = map.difficulty
@@ -37,10 +37,8 @@ def send_start(data):
 
 def send_neighbours(data):
     """
-    calls generate inputs and sends to the UI a geojson file with them
+    calls generate neighbours and sends to the UI a JSON file with them
     """
-    # if "undo" in data.keys():
-    #     return jsonify({"error": "The undo function is not implemented yet"}), 400
     
     neighbours = map.generate_neighbours(MIN_DISTANCE)
     map.process_inputs(data["current"])
@@ -48,7 +46,7 @@ def send_neighbours(data):
 
 def send_score_and_path(data):
     """
-    sends the score to the UI in a geojson file
+    sends the score to the UI in a JSON file
     """
     map.process_inputs(data["current"])
     return jsonify({"paths": optimal_paths})
@@ -61,6 +59,7 @@ if __name__ == "__main__":
         if data["type"] == "end":
             break
 
+# testing if some functions work properly
 # Graph = gr.GeoGraph("map_complex.geojson")
 # print(Graph.G.nodes)
 # Map = Map.Map(Graph)
