@@ -23,9 +23,10 @@ class Map:
 
         #The minimum distance is already set by the developer, and it remains a parameter just for testing purposes
         self.start, self.end = self.generate_start_end()
+
         self.current_pos = self.start
 
-        self.optimal_path = self.astar(self.difficulty)
+        self.optimal_path = self.astar(5)
 
     def _create_graph(self, graph_file):
         #NetworkX fills in the nodes
