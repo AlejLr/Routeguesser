@@ -26,6 +26,12 @@ def send_start(data):
     """
     sends the start, end and blocked nodes to the UI in a JSON file
     """
+    """TO DO
+
+    The difficulty should be set by the front end, not returned by the backend
+
+    """
+
     map = Map("complex_graph.json")
     data["difficulty"] = map.difficulty
     start = map.start
@@ -40,7 +46,7 @@ def send_neighbours(data):
     calls generate neighbours and sends to the UI a JSON file with them
     """
     
-    neighbours = map.generate_neighbours(MIN_DISTANCE)
+    neighbours = map.get_neighbours_and_roads()
     map.process_inputs(data["current"])
     return jsonify({"neighbours": neighbours})
 
