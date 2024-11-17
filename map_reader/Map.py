@@ -25,9 +25,9 @@ class Map:
 
     def generate_blocked_roads(self, number_of_blocked_nodes):
         """generates blocked nodes that are roughly in the direction of the end from the start, based on the difficulty (number of blocked nodes)
-        returns a dictionary of blocked nodes, with the starting nodes for a road as a key, and intermediate nodes as values
+        returns a dictionary of blocked nodes, with the starting nodes for a road as a key, and intermediate nodes as values (in order from the current node to the neighbour)
         Alternatively, the values can be empty and we can just use the blocked nodes
-        rtype: dict(G.node, set(G.node))
+        rtype: dict(G.node, list(G.node))
         """
         #TODO
         # you can access graph nodes with G.nodes
