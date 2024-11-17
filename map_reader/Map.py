@@ -24,9 +24,8 @@ class Map:
 
 
     def generate_blocked_roads(self, number_of_blocked_nodes):
-        """generates blocked nodes that are roughly in the direction of the end from the start, based on the difficulty (number of blocked nodes)
-        returns a dictionary of blocked nodes, with the starting nodes for a road as a key, and intermediate nodes as values (in order from the current node to the neighbour)
-        Alternatively, the values can be empty and we can just use the blocked nodes
+        """generates blocked roads that are roughly in the direction of the end from the start, based on the difficulty (number of blocked nodes)
+        returns a dictionary of blocked roads, with the starting nodes for a road as a key, and lists of intermediate nodes as values(in order)
         rtype: dict(G.node, list(G.node))
         """
         #TODO
@@ -73,14 +72,16 @@ class Map:
         Generates a dictionary of neighbouring nodes for each node in the graph.
 
         For each node in the graph, this method finds all neighbouring nodes that are at least `min_distance` away.
-        The result is a dictionary where each key is a node, and the value is a tuple containing a list of neighbouring nodes
-        and the count of those neighbours.
+        The result is a dictionary where each key is a neighbour node, and the value is a tuple containing a list of neighbouring nodes (so a path) in order and a distance to that neighbour
+        and the distance. 
+
+        IMPORTANT: it should generate neighbours in all directions, not only in the direction of the end (needed for frontend)
 
         Args:
         min_distance (int): The minimum distance required between nodes to be considered neighbours.
 
         Returns:
-        dict: A dictionary where the keys are nodes and the values are tuples. Each tuple contains a list of neighbouring nodes
+        dict: A dictionary where the keys are nodes and the values are tuples. Each tuple contains a list of intermediate nodes leading from the current node (self.current) to the given neighbour and a distance that we travel to the neighbour. The list in the tuple may be empty if the neighbour is in a straight line from current, but the distance must not be empty
               and an integer representing the distance to the chosen neighbour.
         rtype: dict(G.node, tuple(list(G.node), int))
         """
@@ -89,11 +90,10 @@ class Map:
 
     def process_inputs(self, next_node):
         """
-        increment the score, changes the current_pos
+        changes the current_pos
+        (no need to change the score, as it is calculated in front end)
         """
         self.current_pos = next_node
-        # if next_node not in self.path:
-        #     self.score += self.calculate_cartesian_distance(self.current_pos, self.next_node)
 
     
     def calculate_cartesian_distance(self, node1, node2):
