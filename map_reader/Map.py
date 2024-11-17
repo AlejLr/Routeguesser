@@ -25,9 +25,8 @@ class Map:
         self.optimal_path = self.astar(self.difficulty)"""
 
     def _create_graph(self, graph_file):
-
-        #NetworkX already fills in the nodes
-        #Right now, ROADS are lists of lists, but this can be changed
+        #NetworkX fills in the nodes
+        #ROADS are lists of lists, but this can be changed in the future
         Graph = nx.Graph()
         with open(graph_file, "r") as file:
             graph_list = json.load(file)
