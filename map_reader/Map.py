@@ -9,20 +9,23 @@ class Map:
     The Map will be able to export data in a presentable manner for the UI.
     (CONSIDER) The greater Map will be composed by multiple smaller Maps so that we can work in chunks based on zoom in.
     """
-    def __init__(self, graph_file):
+    def __init__(self, graph_file, difficulty=10):
         """
         also generates the blocked nodes
         """
         self.Graph = self._create_graph(graph_file)
 
-        """self.difficulty = 10
-        self.number_of_blocked_nodes = 0
-        self.blocked_roads = self.generate_blocked_roads(self.difficulty)
-        # self.score = 0
-        self.startend = self.generate_start_end(1000)
+        self.number_of_blocked_nodes = difficulty
+        #the blocked roads are encoded as the attribute 'blocked' of the graph edges
+        self.generate_blocked_roads(self.difficulty)
+
+        self.score = 0
+
+        #The minimum distance is already set by the developer, and it remains a parameter just for testing purposes
+        self.start, self.end = self.generate_start_end()
         self.current_pos = self.start
-        self.chosen_path = [self.start]
-        self.optimal_path = self.astar(self.difficulty)"""
+
+        self.optimal_path = self.astar(self.difficulty)
 
     def _create_graph(self, graph_file):
         #NetworkX fills in the nodes
@@ -31,7 +34,7 @@ class Map:
         with open(graph_file, "r") as file:
             graph_list = json.load(file)
             for edge in graph_list:
-                Graph.add_edge(tuple(edge["start"]), tuple(edge["end"]), dist=edge["dist"], road=edge["road"])
+                Graph.add_edge(tuple(edge["start"]), tuple(edge["end"]), dist=edge["dist"], road=edge["road"], blocked=False)
         return Graph
 
     def generate_blocked_roads(self, number_of_blocked_nodes):
