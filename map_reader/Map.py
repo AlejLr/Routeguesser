@@ -1,4 +1,5 @@
 import numpy as np
+import json
 import networkx as nx
 class Map:
     """
@@ -8,11 +9,11 @@ class Map:
     The Map will be able to export data in a presentable manner for the UI.
     (CONSIDER) The greater Map will be composed by multiple smaller Maps so that we can work in chunks based on zoom in.
     """
-    def __init__(self, Graph):
+    def __init__(self, graph_file):
         """
         also generates the blocked nodes
         """
-        self.Graph = Graph
+        self.Graph = self._create_graph(graph_file)
         self.difficulty = 10
         self.number_of_blocked_nodes = 0
         self.blocked_roads = self.generate_blocked_roads(self.difficulty)
@@ -22,6 +23,12 @@ class Map:
         self.chosen_path = [self.start]
         self.optimal_path = self.astar(self.difficulty)
 
+    def _create_graph(self,graph_file):
+        G = nx.Graph()
+        with open(graph_file, "r"):
+            graph_list = json.load(graph_file)
+            for edge in graph_list:
+                G.add_edge(edge["start"], edge["end"], dist=edge["dist"], road=edge["road"])
 
     def generate_blocked_roads(self, number_of_blocked_nodes):
         """generates blocked roads that are roughly in the direction of the end from the start, based on the difficulty (number of blocked nodes)
