@@ -28,12 +28,11 @@ def file_cleaner(in_file_name, out_file_name):
 
 
 def euclidean_dist(coord1, coord2):
-
     return (sum((c1 - c2) ** 2 for c1, c2 in zip(coord1, coord2)))**1/2
 def dist(points):
     return sum(euclidean_dist(points[i], points[i + 1]) for i in range(len(points) - 1))
 
-file_cleaner("map_simple.geojson", "simple_graph.json")
+file_cleaner("map_complex.geojson", "complex_graph.json")
 
 
 

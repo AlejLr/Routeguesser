@@ -14,21 +14,26 @@ class Map:
         also generates the blocked nodes
         """
         self.Graph = self._create_graph(graph_file)
-        self.difficulty = 10
+
+        """self.difficulty = 10
         self.number_of_blocked_nodes = 0
         self.blocked_roads = self.generate_blocked_roads(self.difficulty)
         # self.score = 0
         self.startend = self.generate_start_end(1000)
         self.current_pos = self.start
         self.chosen_path = [self.start]
-        self.optimal_path = self.astar(self.difficulty)
+        self.optimal_path = self.astar(self.difficulty)"""
 
-    def _create_graph(self,graph_file):
-        G = nx.Graph()
-        with open(graph_file, "r"):
-            graph_list = json.load(graph_file)
+    def _create_graph(self, graph_file):
+
+        #NetworkX already fills in the nodes
+        #Right now, ROADS are lists of lists, but this can be changed
+        Graph = nx.Graph()
+        with open(graph_file, "r") as file:
+            graph_list = json.load(file)
             for edge in graph_list:
-                G.add_edge(edge["start"], edge["end"], dist=edge["dist"], road=edge["road"])
+                Graph.add_edge(tuple(edge["start"]), tuple(edge["end"]), dist=edge["dist"], road=edge["road"])
+        return Graph
 
     def generate_blocked_roads(self, number_of_blocked_nodes):
         """generates blocked roads that are roughly in the direction of the end from the start, based on the difficulty (number of blocked nodes)
@@ -51,7 +56,7 @@ class Map:
         #TODO
         # also here, you can access nodes like this
         # this is an example and does not work for now
-        nodes = list(self.Graph.G.nodes)
+        nodes = list(self.Graph.nodes)
     
         print(nodes)
         while True:
@@ -108,3 +113,5 @@ class Map:
         calculate the distance between two nodes
         """
         return ((node1[0] - node2[0])**2 + (node1[1] - node2[1])**2)**0.5
+
+Map("complex_graph.json")

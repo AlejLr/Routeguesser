@@ -1,5 +1,4 @@
 import Map
-import graph_reader as gr
 from Flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -27,7 +26,7 @@ def send_start(data):
     """
     sends the start, end and blocked nodes to the UI in a JSON file
     """
-    map = Map(gr.GeoGraph("map_complex.geojson"))
+    map = Map("complex_graph.json")
     data["difficulty"] = map.difficulty
     startend = map.startend
     blocked_nodes = map.generate_blocked_nodes()
