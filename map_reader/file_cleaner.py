@@ -25,8 +25,8 @@ def file_cleaner(in_file_name, out_file_name):
 
     with open(out_file_name, "w") as outfile:
         json.dump(new_json, outfile)
-def euclidean_dist(coord1, coord2):
-    return (sum((c1 - c2) ** 2 for c1, c2 in zip(coord1, coord2)))**1/2
+def euclidean_dist(node1, node2):
+    return ((node1[0] - node2[0])**2 + (node1[1] - node2[1])**2)**0.5
 def dist(points):
     return sum(euclidean_dist(points[i], points[i + 1]) for i in range(len(points) - 1))
 

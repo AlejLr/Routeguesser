@@ -28,11 +28,12 @@ def send_start(data):
     """
     map = Map("complex_graph.json")
     data["difficulty"] = map.difficulty
-    startend = map.startend
-    blocked_nodes = map.generate_blocked_nodes()
-    neighbours = map.generate_neighbours(5)
+    start = map.start
+    end = map.end
+    blocked_roads = map.get_blocked_roads_list()
+    neighbours = map.get_neighbours_and_roads()
     optimal_paths = map.optimal_path
-    return jsonify({"startend" : startend, "blocked nodes": blocked_nodes, "neighbours": neighbours, "optimal path" :  optimal_paths})
+    return jsonify({"start" : start, "end" : end, "blocked nodes": blocked_roads, "neighbours": neighbours, "optimal path" :  optimal_paths})
 
 def send_neighbours(data):
     """
