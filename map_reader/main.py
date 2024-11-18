@@ -17,8 +17,7 @@ def main():
         return send_start(data)
     elif data["type"] == "neighbours":
         return send_neighbours(data)
-    elif data["type"] == "end":
-        return send_score_and_path(data)
+ 
     
     return jsonify({"error" : "The data is not a JSON or the format is invalid"}), 400
 
@@ -26,20 +25,12 @@ def send_start(data):
     """
     sends the start, end and blocked nodes to the UI in a JSON file
     """
-    """TO DO
-
-    The difficulty should be set by the front end, not returned by the backend
-
-    """
 
     map = Map("complex_graph.json")
     data["difficulty"] = map.difficulty
-    start = map.start
-    end = map.end
     blocked_roads = map.get_blocked_roads_list()
     neighbours = map.get_neighbours_and_roads()
-    optimal_paths = map.optimal_path
-    return jsonify({"start" : start, "end" : end, "blocked nodes": blocked_roads, "neighbours": neighbours, "optimal path" :  optimal_paths})
+    return jsonify({"start" : map.start, "end" : map.end, "blocked nodes": blocked_roads, "neighbours": neighbours, "optimal path" :  map.optimal_path, "optimal distance" : map.optimal_distance})
 
 def send_neighbours(data):
     """
@@ -48,15 +39,7 @@ def send_neighbours(data):
     
     neighbours = map.get_neighbours_and_roads()
     map.process_inputs(data["current"])
-    return jsonify({"neighbours": neighbours})
-
-def send_score_and_path(data):
-    """
-    sends the score to the UI in a JSON file
-    """
-    map.process_inputs(data["current"])
-    return jsonify({"paths": optimal_paths})
-
+    return jsonify({neighbours})
 
 if __name__ == "__main__":
     while True:
