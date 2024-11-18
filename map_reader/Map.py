@@ -97,10 +97,7 @@ class Map:
         """ 
 
         while priority_queue:
-            # priority_queue.sort(key=lambda x: x[1])
-            # current, distance = priority_queue.pop(0)
             # sort the queue based on the smallest prospective distance to the end
-            # priority_queue =  sorted(priority_queue, key=lambda x: x[1])
             _, current, distance = priority_queue.get()
             if current == end:
                 break
@@ -109,8 +106,6 @@ class Map:
                 candidate_distance = self.__history__[current][1] + self.calculate_cartesian_distance(current, neighbour)* Decimal(10000)
                 previous_distance = self.__history__[neighbour][1] if neighbour in self.__history__ else Decimal("inf")
                 if (candidate_distance < previous_distance or neighbour not in self.__history__) and (not self.Graph[current][neighbour]["blocked"] or exclude_blocked):
-                    if (neighbour in self.__history__) and candidate_distance < previous_distance:
-                        print(f"Updating distance for {neighbour} from {previous_distance} to {candidate_distance}")
                     new_distance = candidate_distance
                     # astar step
                     heuristic = self.calculate_cartesian_distance(neighbour, end) * Decimal(10000)
