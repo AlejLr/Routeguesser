@@ -2,6 +2,10 @@
 import json
 import networkx as nx
 import random
+import matplotlib.pyplot as plt
+from decimal import Decimal, getcontext
+from queue import PriorityQueue
+
 class Map:
     """
     A map is a dynamic data structure.
@@ -25,31 +29,31 @@ class Map:
         self.start, self.end = self.generate_start_end()
         self.current_pos = self.start
 
-        self.optimal_path = self.astar()
+        self.optimal_path, self.optimal_distance = self.astar()
 
     def _create_graph(self, graph_file):
         # NetworkX fills in the nodes
         # ROADS are lists of lists, but this can be changed in the future
-        Graph = nx.Graph()
+        raw_graph = nx.Graph()
         with open(graph_file, "r") as file:
             graph_list = json.load(file)
             for edge in graph_list:
-                Graph.add_edge(tuple(edge["start"]), tuple(edge["end"]), dist=edge["dist"], road=edge["road"],
+                raw_graph.add_edge(tuple(edge["start"]), tuple(edge["end"]), dist=edge["dist"], road=edge["road"],
                                blocked=False)
-        return Graph
-
+                
+        #to make sure the graph is fully connected we get all the connected components and then take the largest one
+        # this way we avoid having unreachable nodes, which is needed for pathfinding
+        all_connected_components = sorted(nx.connected_components(raw_graph), key=len, reverse=True)
+        return raw_graph.subgraph(all_connected_components[0])
+        
     def generate_blocked_roads(self, number_of_blocked_nodes):
-        """generates blocked roads that are roughly in the direction of the end from the start, based on the difficulty (number of blocked nodes)
-        returns a dictionary of blocked roads, with the starting nodes for a road as a key, and lists of intermediate nodes as values(in order)
-        rtype: dict(G.node, list(G.node))
+        """
+        param: number of blocked nodes int
+
+        generates blocked roads in the graph by modifying the graph object, and setting the blocked attribute to True
         """
         # TODO
-        # you can access graph nodes with G.nodes
-        # for node in np.random.choice(self.Graph.G.nodes, number_of_blocked_nodes):
-        #     pass 
-        # pass
-        # result = {}
-        # # return result
+        #
 
     def reset_blocked_roads(self):
         nx.set_edge_attributes(self.Graph, False, name="blocked")
@@ -57,7 +61,7 @@ class Map:
 
     def generate_start_end(self, min_distance=0):
         """generate a start and end node randomly from the graph, which must have a minimum distance between them
-        rtype:  (tuple, tuple)"""
+        rtype:  (tuple(int, int), tuple(int, int))"""
         nodes = list(self.Graph.nodes)
         while True:
             start, end = random.sample(nodes, 2)
@@ -69,21 +73,78 @@ class Map:
     def __repr__(self):
         return f"Current: {self.current_pos}, Start: {self.start}, End:{self.end}, number of blocked roads:{self.number_of_blocked_roads}"
 
-    def astar(self, numberofpaths = 0):
+    def astar(self, numberofpaths = 1):
         """
         generate an optimal path(s) between start and end
         returns: dict of nodes (which contain coordinates) and their scores, the score being the value (length of the path for now)
-        rtype: dict(list(G.node), int)
+        rtype: tuple(list(Graph.node), int)
         """
-        # TODO
-        pass
+        start, end = self.start, self.end
+        # we keep track of the heuristic and distance in the queue, while in the history we keep track of the distance
+        priority_queue = PriorityQueue()
+        priority_queue.put((0, start, 0))
+        self.__history__ = {start: (None, 0)}
+        self.astar_solver(priority_queue, end)
+        return self.get_optimal_path_and_distance(end)
+
+
+    def astar_solver(self, priority_queue, end, exclude_blocked=True):
+        """
+        The main loop of the astar algorithm
+        using calculate_cartesian_distance we calculate for every node its' distance to the end in a straight line
+        We use this to judge which node is best to visit next
+
+        This function modifies self.__history__ as a side effect
+        """
+
+        while priority_queue:
+            # priority_queue.sort(key=lambda x: x[1])
+            # current, distance = priority_queue.pop(0)
+            # sort the queue based on the smallest prospective distance to the end
+            # priority_queue =  sorted(priority_queue, key=lambda x: x[1])
+            _, current, distance = priority_queue.get()
+            if current == end:
+                break
+            for neighbour in self.Graph[current]:
+                # add the neighbour if it is not blocked, 
+                if neighbour not in self.__history__ and (not self.Graph[current][neighbour]["blocked"] or exclude_blocked):
+                    new_distance = Decimal(distance) + Decimal(self.Graph[current][neighbour]["dist"]) * Decimal(10000)
+                    # astar step
+                    new_heuristic = self.calculate_cartesian_distance(neighbour, end)
+                    # priority_queue.append((neighbour, new_heuristic, new_distance))
+                    priority_queue.put((new_heuristic, neighbour, new_distance))
+                    self.__history__[neighbour] = (current, new_distance)
+
+            
+
+    def get_optimal_path_and_distance(self, end):
+        """
+        returns the optimal path from the start to the end, using self.__history__
+        rtype: list(Graph.node)
+        """
+        path = []
+        current = end
+        path_distance = self.__history__[end][1]
+        while current is not None:
+            path.append(current)
+            current = self.__history__[current][0]
+
+        # the path is reversed at first, so we need to undo this operation
+        return path[::-1], path_distance
+
 
     def get_neighbours_and_roads(self, node=None, exclude_blocked=True):
         """Generates a dictionary of neighbouring nodes for each node in the graph.
         The key are the neighbour nodes, the values the list of coordinates in between
         By default, it returns the neighbours of the current position
         By default, it does not return the blocked edges
-        This is the function to return to the frontend"""
+        This is the function to return to the frontend
+        
+        
+        TODO: it should also return the length of the road to the neighbour, not just the road
+
+        rtype: dict(G.node, tuple(list(Graph.node), float))
+        """
 
         if node is None:
             node = self.current_pos
@@ -91,7 +152,7 @@ class Map:
 
         for neighbour in list(self.Graph.neighbors(node)):
             if (self.Graph[node][neighbour]["blocked"] is False) or (exclude_blocked is False):
-                neighbour_and_roads[neighbour] = self.Graph[node][neighbour]["road"]
+                neighbour_and_roads[neighbour] = (self.Graph[node][neighbour]["road"], Decimal(self.Graph[node][neighbour]["dist"]) * Decimal(10000))
 
         return neighbour_and_roads
 
@@ -116,8 +177,41 @@ class Map:
     def calculate_cartesian_distance(node1, node2):
         """
         calculate the distance between two nodes
+
+        retype: Decimal()
         """
-        return ((node1[0] - node2[0]) ** 2 + (node1[1] - node2[1]) ** 2) ** 0.5
+        return (Decimal(node1[0] - node2[0]) ** Decimal(2) + Decimal(node1[1] - node2[1]) ** Decimal(2)) ** Decimal(0.5)
 
 
-Map("complex_graph.json")
+    def __visualize__(self, path=None):
+        """
+        Visualizes the graph and highlights a particular path if provided.
+        :param path: List of nodes representing the path to be highlighted.
+        """
+        pos = {node: node for node in self.Graph.nodes()}  # Use node coordinates as positions
+        plt.figure(figsize=(10, 10))
+        
+        # Draw the graph
+        nx.draw(self.Graph, pos, with_labels=True, node_size=5, node_color='lightblue', font_size=1, font_weight='bold')
+        
+        # Highlight the path if provided
+        if path:
+            path_edges = list(zip(path, path[1:]))
+            nx.draw_networkx_nodes(self.Graph, pos, nodelist=path, node_color='red', node_size=6)
+            nx.draw_networkx_edges(self.Graph, pos, edgelist=path_edges, edge_color='red', width=2)
+        
+        plt.show()
+
+
+# some testing code, uncomment to visualize a path on a graph with random start and end
+map = Map("complex_graph.json")
+current = list(map.Graph.nodes)[0]
+start, end = map.start, map.end
+start, end = (4.502019, 52.164821), (4.502267, 52.157416)
+print(f"START: {start}, END: {end}")
+optimal_path = map.optimal_path
+print(f"OPTIMAL PATH: {optimal_path}")
+print(f"OPTIMAL PATH DISTANCE: {map.optimal_distance}")
+map.__visualize__(optimal_path)
+
+    
