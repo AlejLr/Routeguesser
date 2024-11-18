@@ -73,14 +73,14 @@ class Map:
     def __repr__(self):
         return f"Current: {self.current_pos}, Start: {self.start}, End:{self.end}, number of blocked roads:{self.number_of_blocked_roads}"
 
-    def astar(self, numberofpaths = 1):
+    def astar(self):
         """
-        generate an optimal path(s) between start and end
+        generate an optimal path between start and end (we only need one, it was recently discussed with front end)
         returns: dict of nodes (which contain coordinates) and their scores, the score being the value (length of the path for now)
         rtype: tuple(list(Graph.node), int)
         """
         start, end = self.start, self.end
-        # we keep track of the heuristic and distance in the queue, while in the history we keep track of the distance
+        # we keep track of the heuristic and distance in the priority queue, while in the history we keep track of only the distance
         priority_queue = PriorityQueue()
         priority_queue.put((0, start, 0))
         self.__history__ = {start: (None, 0)}
