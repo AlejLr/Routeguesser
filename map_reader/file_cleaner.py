@@ -20,6 +20,9 @@ def file_cleaner(in_file_name, out_file_name):
         for obj_dict in gjson_objs:
             if obj_dict["geometry"]["type"] == 'LineString':
                 road = obj_dict["geometry"]["coordinates"]
+                # skip circular roads
+                if road[0] == road[-1]:
+                    continue
                 new_edge = { "start": road[0], "end": road[-1], "road": road, "dist": dist(road)}
                 new_json.append(new_edge)
 
