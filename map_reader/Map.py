@@ -1,4 +1,3 @@
-
 import json
 import networkx as nx
 import random
@@ -36,7 +35,7 @@ class Map:
         # ROADS are lists of lists, but this can be changed in the future
         raw_graph = nx.Graph()
         with open(graph_file, "r") as file:
-            graph_list = json.load(file)
+            graph_list = json.load(file)    
             for edge in graph_list:
                 raw_graph.add_edge(tuple(edge["start"]), tuple(edge["end"]), dist=edge["dist"], road=edge["road"],
                                blocked=False)
@@ -59,13 +58,13 @@ class Map:
         nx.set_edge_attributes(self.Graph, False, name="blocked")
         return None
 
-    def generate_start_end(self, min_distance=0):
+    def generate_start_end(self, min_distance=100):
         """generate a start and end node randomly from the graph, which must have a minimum distance between them
         rtype:  (tuple(int, int), tuple(int, int))"""
         nodes = list(self.Graph.nodes)
         while True:
             start, end = random.sample(nodes, 2)
-            if self.calculate_cartesian_distance(start, end) >= min_distance:
+            if self.calculate_cartesian_distance(start, end)*Decimal(10000) >= Decimal(min_distance):
                 break
 
         return start, end
@@ -75,12 +74,12 @@ class Map:
 
     def astar(self):
         """
-        generate an optimal path between start and end (we only need one, it was recently discussed with front end)
+        generate an optimal path(s) between start and end
         returns: dict of nodes (which contain coordinates) and their scores, the score being the value (length of the path for now)
         rtype: tuple(list(Graph.node), int)
         """
         start, end = self.start, self.end
-        # we keep track of the heuristic and distance in the priority queue, while in the history we keep track of only the distance
+        # we keep track of the heuristic and distance in the queue, while in the history we keep track of the distance
         priority_queue = PriorityQueue()
         priority_queue.put((0, start, 0))
         self.__history__ = {start: (None, 0)}
@@ -95,7 +94,7 @@ class Map:
         We use this to judge which node is best to visit next
 
         This function modifies self.__history__ as a side effect
-        """
+        """ 
 
         while priority_queue:
             # priority_queue.sort(key=lambda x: x[1])
@@ -106,14 +105,18 @@ class Map:
             if current == end:
                 break
             for neighbour in self.Graph[current]:
-                # add the neighbour if it is not blocked, 
-                if neighbour not in self.__history__ and (not self.Graph[current][neighbour]["blocked"] or exclude_blocked):
-                    new_distance = Decimal(distance) + Decimal(self.Graph[current][neighbour]["dist"]) * Decimal(10000)
+                # add the neighbour if it is not blocked,
+                candidate_distance = self.__history__[current][1] + self.calculate_cartesian_distance(current, neighbour)* Decimal(10000)
+                previous_distance = self.__history__[neighbour][1] if neighbour in self.__history__ else Decimal("inf")
+                if (candidate_distance < previous_distance or neighbour not in self.__history__) and (not self.Graph[current][neighbour]["blocked"] or exclude_blocked):
+                    if (neighbour in self.__history__) and candidate_distance < previous_distance:
+                        print(f"Updating distance for {neighbour} from {previous_distance} to {candidate_distance}")
+                    new_distance = candidate_distance
                     # astar step
-                    new_heuristic = self.calculate_cartesian_distance(neighbour, end)
-                    # priority_queue.append((neighbour, new_heuristic, new_distance))
-                    priority_queue.put((new_heuristic, neighbour, new_distance))
+                    heuristic = self.calculate_cartesian_distance(neighbour, end) * Decimal(10000)
                     self.__history__[neighbour] = (current, new_distance)
+                    priority_queue.put((new_distance + heuristic, neighbour, new_distance))
+                    
 
             
 
@@ -204,10 +207,10 @@ class Map:
 
 
 # some testing code, uncomment to visualize a path on a graph with random start and end
+print("TESTING")
 map = Map("complex_graph.json")
 current = list(map.Graph.nodes)[0]
 start, end = map.start, map.end
-start, end = (4.502019, 52.164821), (4.502267, 52.157416)
 print(f"START: {start}, END: {end}")
 optimal_path = map.optimal_path
 print(f"OPTIMAL PATH: {optimal_path}")
