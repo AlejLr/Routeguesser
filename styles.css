@@ -1,5 +1,5 @@
 /* Game Explanation, also called "A piece of art" */
-/* Work in progress
+
 #gameExplanation {
     position: fixed;
     top: 0;
@@ -9,90 +9,37 @@
     background-color: rgba(0, 0, 0, 0.8);
     color: rgba(255, 255, 255, 0.9);
     display: flex;
+    flex-direction: column; 
     justify-content: center;
     align-items: center;
     z-index: 1000;
 }
 
-#g9 #logo{
-    font-size: 10em;
-}
-
-#gameExplanation .content {
-    position: relative;
-    width: 100%;
-    text-align: center;
-}
-
-#gameExplanation .content > * {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
 .hidden {
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 1s ease-in-out, visibility 0s linear 1s;
+    display: none;
 }
 
 .fade-in {
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 1s ease-in-out;
+    animation: fadeIn 1s forwards;
 }
 
 .fade-out {
-    opacity: 0;
-    transition: opacity 1s ease-in-out, visibility 0s linear 1s;
-}
-
-.change-Position {
-
-}
-
-@keyframes fadeInOut {
-    0% {
-        opacity: 0;
-    }
-    20% {
-        opacity: 1;
-    }
-    80% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
+    animation: fadeOut 1s forwards;
 }
 
 @keyframes fadeIn {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 @keyframes fadeOut {
-    0% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
+    from { opacity: 1; }
+    to { opacity: 0; }
 }
 
-@keyframes changePosition {
-    0%{
-        position:absolute;
-    }
-    100%{
-        position:fixed;
-    }
-} */
+#gameExplanation .content > * {
+    margin: 10px 0; /* Add margin to space out elements */
+}
 
 /* In game items */
 #map{
@@ -206,9 +153,8 @@ input[type="number"]{
 
 
 /* Always on the end for not showing before the Game explanation */
-/*
+
 #menu,
-#map,
 #distanceReset {
     display: none;
 }
