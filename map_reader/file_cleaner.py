@@ -26,6 +26,10 @@ def file_cleaner(in_file_name, out_file_name):
                 new_edge = { "start": road[0], "end": road[-1], "road": road, "dist": dist(road)}
                 new_json.append(new_edge)
 
+        for el in list(new_json.keys()):
+            if el["start"] == el["end"]:
+                new_json.remove(el)
+
     with open(out_file_name, "w") as outfile:
         json.dump(new_json, outfile)
 def euclidean_dist(node1, node2):
