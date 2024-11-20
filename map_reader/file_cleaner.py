@@ -12,6 +12,7 @@
 
 import geojson
 import json
+import networkx as nx
 new_json = []
 def file_cleaner(in_file_name, out_file_name):
     with open(in_file_name, "r") as infile:
@@ -25,6 +26,17 @@ def file_cleaner(in_file_name, out_file_name):
                     continue
                 new_edge = { "start": road[0], "end": road[-1], "road": road, "dist": dist(road)}
                 new_json.append(new_edge)
+
+    raw_graph = nx.Graph()
+
+    for edge in new_json:
+        raw_graph.add_edge(tuple(edge["start"]), tuple(edge["end"]), dist=edge["dist"], road=edge["road"],
+                           blocked=False)
+    all_connected_components = sorted(nx.connected_components(raw_graph), key=len, reverse=True)
+    first_component = all_connected_components[0]
+    for edge in new_json:
+        if (tuple(edge["start"]) or tuple(edge["end"])) not in first_component:
+            new_json.remove(edge)
 
 
 
