@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 from decimal import Decimal, getcontext
 from queue import PriorityQueue
 
+from networkx import adjacency_graph
+
+
 class Map:
     """
     A map is a dynamic data structure.
@@ -33,17 +36,18 @@ class Map:
     def _create_graph(self, graph_file):
         # NetworkX fills in the nodes
         # ROADS are lists of lists, but this can be changed in the future
-        raw_graph = nx.Graph()
-        with open(graph_file, "r") as file:
-            graph_list = json.load(file)    
-            for edge in graph_list:
-                raw_graph.add_edge(tuple(edge["start"]), tuple(edge["end"]), dist=edge["dist"], road=edge["road"],
-                               blocked=False)
-                
-        #to make sure the graph is fully connected we get all the connected components and then take the largest one
-        # this way we avoid having unreachable nodes, which is needed for pathfinding
-        all_connected_components = sorted(nx.connected_components(raw_graph), key=len, reverse=True)
-        return raw_graph.subgraph(all_connected_components[0])
+
+        data = json.load(open(graph_file))
+        #Tuples are not native json data types
+        for node in data["nodes"]:
+            node["id"] = tuple(node["id"])
+        for adj_list in data["adjacency"]:
+            for edge in adj_list:
+                edge["id"] = tuple(edge["id"])
+
+        graph = adjacency_graph(data, directed=False, multigraph=False, attrs={'id': 'id', 'key': 'key'})
+
+        return graph
         
     def generate_blocked_roads(self, number_of_blocked_nodes):
         """
@@ -207,6 +211,8 @@ map = Map("complex_graph.json")
 current = list(map.Graph.nodes)[0]
 start, end = map.start, map.end
 print(f"START: {start}, END: {end}")
+
+print(map.get_neighbours_and_roads())
 optimal_path = map.optimal_path
 print(f"OPTIMAL PATH: {optimal_path}")
 print(f"OPTIMAL PATH DISTANCE: {map.optimal_distance}")

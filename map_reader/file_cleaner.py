@@ -13,30 +13,30 @@
 import geojson
 import json
 import networkx as nx
+from networkx import adjacency_data
+
 new_json = []
+from networkx.readwrite import json_graph
+
 def file_cleaner(in_file_name, out_file_name):
+
+    raw_graph = nx.Graph()
     with open(in_file_name, "r") as infile:
         gjson = geojson.load(infile)
         gjson_objs = gjson["features"]
         for obj_dict in gjson_objs:
             if obj_dict["geometry"]["type"] == 'LineString':
-                road = obj_dict["geometry"]["coordinates"]
+                road = [tuple(x) for x in obj_dict["geometry"]["coordinates"]]
                 # skip circular roads
                 if road[0] == road[-1]:
                     continue
-                new_edge = { "start": road[0], "end": road[-1], "road": road, "dist": dist(road)}
-                new_json.append(new_edge)
+                raw_graph.add_edge(road[0], road[-1], dist=dist(road), road=road,
+                                   blocked=False)
 
-    raw_graph = nx.Graph()
-
-    for edge in new_json:
-        raw_graph.add_edge(tuple(edge["start"]), tuple(edge["end"]), dist=edge["dist"], road=edge["road"],
-                           blocked=False)
     all_connected_components = sorted(nx.connected_components(raw_graph), key=len, reverse=True)
-    first_component = all_connected_components[0]
-    for edge in new_json:
-        if (tuple(edge["start"]) or tuple(edge["end"])) not in first_component:
-            new_json.remove(edge)
+    graph = raw_graph.subgraph(all_connected_components[0])
+
+    new_json = adjacency_data(graph, attrs={'id': 'id', 'key': 'key'})
 
     with open(out_file_name, "w") as outfile:
         json.dump(new_json, outfile)
