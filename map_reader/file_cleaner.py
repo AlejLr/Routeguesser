@@ -38,9 +38,6 @@ def file_cleaner(in_file_name, out_file_name):
         if (tuple(edge["start"]) or tuple(edge["end"])) not in first_component:
             new_json.remove(edge)
 
-
-
-
     with open(out_file_name, "w") as outfile:
         json.dump(new_json, outfile)
 def euclidean_dist(node1, node2):
