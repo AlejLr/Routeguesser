@@ -25,8 +25,7 @@ class Map:
 
         self.number_of_blocked_roads = difficulty
         self.blocked_roads = self.generate_blocked_roads(self.number_of_blocked_roads)
-        self.generate_blocked_roads(self.number_of_blocked_roads)
-
+        
         self.score = 0
 
         self.start, self.end = self.generate_start_end()
@@ -50,18 +49,6 @@ class Map:
         graph = adjacency_graph(data, directed=False, multigraph=False, attrs={'id': 'id', 'key': 'key'})
 
         return graph
-        raw_graph = nx.Graph()
-        with open(graph_file, "r") as file:
-            graph_list = json.load(file)
-            for edge in graph_list:
-                raw_graph.add_edge(tuple(edge["start"]), tuple(edge["end"]), dist=edge["dist"], road=edge["road"],
-                               blocked=False)
-
-        #to make sure the graph is fully connected we get all the connected components and then take the largest one
-        # this way we avoid having unreachable nodes, which is needed for pathfinding
-        all_connected_components = sorted(nx.connected_components(raw_graph), key=len, reverse=True)
-        return raw_graph.subgraph(all_connected_components[0])
-        # return raw_graph
 
     def generate_blocked_roads(self, number_of_blocked_nodes):
         """
@@ -103,7 +90,7 @@ class Map:
             for edge in removable_edges:
                 self.Graph[edge[0]][edge[1]]['blocked'] = True
 
-            # return removable_edges
+            return removable_edges
 
         # Add more specific exceptions
         except Exception as e:
@@ -132,7 +119,7 @@ class Map:
         """
         generate an optimal path(s) between start and end
         returns: dict of nodes (which contain coordinates) and their scores, the score being the value (length of the path for now)
-        rtype: tuple(list(Graph.node), int)
+        rtype: tuple(list(Graph.node), float)
         """
         start, end = self.start, self.end
         # we keep track of the heuristic and distance in the queue, while in the history we keep track of the distance
@@ -251,13 +238,13 @@ class Map:
 
 
 # some testing code, uncomment to visualize a path on a graph with random start and end
-print("TESTING")
-map = Map("complex_graph.json")
-current = list(map.Graph.nodes)[0]
-start, end = map.start, map.end
-print(f"START: {start}, END: {end}")
-optimal_path = map.optimal_path
-print(f"OPTIMAL PATH: {optimal_path}")
-print(f"OPTIMAL PATH DISTANCE: {map.optimal_distance}")
-map.__visualize__(optimal_path)
+# print("TESTING")
+# map = Map("complex_graph.json")
+# current = list(map.Graph.nodes)[0]
+# start, end = map.start, map.end
+# print(f"START: {start}, END: {end}")
+# optimal_path = map.optimal_path
+# print(f"OPTIMAL PATH: {optimal_path}")
+# print(f"OPTIMAL PATH DISTANCE: {map.optimal_distance}")
+# map.__visualize__(optimal_path)
     
