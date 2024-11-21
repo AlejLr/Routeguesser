@@ -14,15 +14,18 @@
     align-items: center;
     z-index: 1000;
 }
+
 #logo{
     width: 400px;
     height: 350px;
     margin-bottom: 20px;
 }
+
 #title, #subtitle, #startGame {
     text-align: center;
     margin: 10px 0; 
 }
+
 .hidden {
     display: none;
 }
