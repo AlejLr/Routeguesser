@@ -14,13 +14,14 @@ class Map:
     (CONSIDER) The greater Map will be composed by multiple smaller Maps so that we can work in chunks based on zoom in.
     """
 
-    def __init__(self, graph_file, difficulty=10):
+    def __init__(self, graph_file, difficulty=50):
         """
         also generates the blocked nodes
         """
         self.Graph = self._create_graph(graph_file)
 
         self.number_of_blocked_roads = difficulty
+        self.blocked_roads = self.generate_blocked_roads(self.number_of_blocked_roads)
         self.generate_blocked_roads(self.number_of_blocked_roads)
 
         self.score = 0
@@ -44,15 +45,54 @@ class Map:
         # this way we avoid having unreachable nodes, which is needed for pathfinding
         all_connected_components = sorted(nx.connected_components(raw_graph), key=len, reverse=True)
         return raw_graph.subgraph(all_connected_components[0])
+        # return raw_graph
         
     def generate_blocked_roads(self, number_of_blocked_nodes):
         """
         param: number of blocked nodes int
 
         generates blocked roads in the graph by modifying the graph object, and setting the blocked attribute to True
+        also returns the list of blocked roads, which is needed for the frontend
+
+        rtype: list(tuple(int, int))
         """
-        # TODO
-        #
+        try:
+            # Check validity of input size, Graph object, etc...
+
+            # Create a copy of the Map Graph
+            copy_g = nx.Graph(self.Graph)
+
+            # List of the possible edges and list of edges that will be removed from original graph
+            possible_edges = list(copy_g.edges())
+            removable_edges = []
+
+            # While the goal is not yet reached
+            while len(removable_edges) < number_of_blocked_nodes:
+                # Check if there are possibilities left
+                if len(possible_edges) < 1:
+                    raise Exception("Cannot remove edges to complete the block roads request.")
+
+                # Choose a random node and remove it from the possibilities
+                try_remove = random.choice(possible_edges)
+                possible_edges.remove(try_remove)
+
+                # Remove it from the graph copy and check if it remains connected, otherwise add it back to retry
+                copy_g.remove_edge(*try_remove)
+                if len(list(nx.connected_components(copy_g))) < 2:
+                    removable_edges.append(try_remove)
+                else:
+                    copy_g.add_edge(*try_remove)
+            
+            # Block the edges in the original graph
+            for edge in removable_edges:
+                self.Graph[edge[0]][edge[1]]['blocked'] = True
+
+            # return removable_edges
+
+        # Add more specific exceptions
+        except Exception as e:
+            raise e
+
 
     def reset_blocked_roads(self):
         nx.set_edge_attributes(self.Graph, False, name="blocked")
@@ -83,7 +123,7 @@ class Map:
         priority_queue = PriorityQueue()
         priority_queue.put((0, start, 0))
         self.__history__ = {start: (None, 0)}
-        self.astar_solver(priority_queue, end)
+        self.astar_solver(priority_queue, end, False)
         return self.get_optimal_path_and_distance(end)
 
 
@@ -154,15 +194,6 @@ class Map:
 
         return neighbour_and_roads
 
-    def get_blocked_roads_list(self):
-        """A list of all blocked roads"""
-        blocked_roads = []
-        for _, _, attrs in self.Graph.edges(data=True):
-            if attrs["blocked"]:
-                blocked_roads.append(attrs["road"])
-
-        return blocked_roads
-
 
     def process_inputs(self, next_node):
         """
@@ -195,9 +226,11 @@ class Map:
         # Highlight the path if provided
         if path:
             path_edges = list(zip(path, path[1:]))
-            nx.draw_networkx_nodes(self.Graph, pos, nodelist=path, node_color='red', node_size=6)
-            nx.draw_networkx_edges(self.Graph, pos, edgelist=path_edges, edge_color='red', width=2)
+            nx.draw_networkx_nodes(self.Graph, pos, nodelist=path, node_color='green', node_size=8)
+            nx.draw_networkx_edges(self.Graph, pos, edgelist=path_edges, edge_color='green', width=2)
         
+        blocked_edges = [(u, v) for u, v, d in self.Graph.edges(data=True) if d['blocked']]
+        nx.draw_networkx_edges(self.Graph, pos, edgelist=blocked_edges, edge_color='red', style='dashed', width=3)
         plt.show()
 
 
@@ -211,5 +244,4 @@ optimal_path = map.optimal_path
 print(f"OPTIMAL PATH: {optimal_path}")
 print(f"OPTIMAL PATH DISTANCE: {map.optimal_distance}")
 map.__visualize__(optimal_path)
-
     
