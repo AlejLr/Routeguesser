@@ -38,6 +38,7 @@ class Map:
         # ROADS are lists of lists, but this can be changed in the future
 
         data = json.load(open(graph_file))
+
         #Tuples are not native json data types
         for node in data["nodes"]:
             node["id"] = tuple(node["id"])
