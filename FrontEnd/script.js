@@ -102,6 +102,13 @@ let distance = 0;
 let difficulty = 50;
 let routesNum = 3;
 
+let blockedNodes;
+let neighbours;
+let optimalDistance;
+let optimalPath;
+let end;
+let start;
+
 const scoreText = document.querySelector('#distanceText');
 const easyButton = document.querySelector('#easy');
 const mediumButton = document.querySelector('#medium');
@@ -116,7 +123,7 @@ const distanceReset = document.querySelector('#distanceReset');
 easyButton.onclick = setDifficultyEasy;
 mediumButton.onclick = setDifficultyMedium;
 hardButton.onclick = setDifficultyHard;
-resetButton.onclick = reset;
+resetButton.onclick = resetGame;
 startGame.onclick = hideStartScreen;
 
 routeNumber.addEventListener('input', updateRoutesNum);
@@ -125,10 +132,24 @@ routeNumber.addEventListener('input', updateRoutesNum);
 // Geting the information thorugh Flask
 
 function loadData(data){
-    
+
+    blockedNodes = data["blocked nodes"];
+    neighbours = data["neighbours"];
+    optimalDistance = data["optimal distance"];
+    optimalPath = data["optimal path"];
+    end = data["end"];
+    start = data["start"];
+
+    console.log("Data loaded");
+    console.log("Blocked nodes:", blockedNodes);
+    console.log("Neighbours:", neighbours);
+    console.log("Optimal distance:", optimalDistance);
+    console.log("Optimal path:", optimalPath);
+    console.log("End:", end);
+    console.log("Start:", start);
 }
 
-async function initialize() {
+async function initializeFlask() {
     const start = {"type": "start", "difficulty": difficulty}
     try{
         const response = await fetch('http://127.0.0.1:5000/main',{
@@ -154,8 +175,8 @@ async function initialize() {
 // Rest of the functions
 
 function startGame(){
-    const data = initialize();
-    initialize().then(data => {
+    const data = initializeFlask();
+    initializeFlask().then(data => {
         console.log(data);
         console.log("Data received");
         loadData(data);
@@ -182,13 +203,16 @@ function setDifficultyHard() {
     startGame();
 }
 
-function reset() {
+function resetGame() {
     console.log("Resetting. Work in progress")
-    path = [startMarker.getLatLng()]
-    polyline.setLatLngs(path);
+
     distance = 0;
     scoreText.innerHTML = distance;
     menu.style.display = "block";
+
+    path = [startMarker.getLatLng()]
+    polyline.setLatLngs(path);
+    
 
 }
 
@@ -209,6 +233,6 @@ function hideStartScreen() {
 }
 
 function updateDistance(addition) {
-    distantce += addition;
+    distance += addition;
     scoreText.innerHTML = distance;
 }
