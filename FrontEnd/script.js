@@ -99,7 +99,7 @@ function runAnimations() {
 // Initiallations
 
 let distance = 0;
-let difficulty = "medium";
+let difficulty = 50;
 let routesNum = 3;
 
 const scoreText = document.querySelector('#distanceText');
@@ -124,8 +124,12 @@ routeNumber.addEventListener('input', updateRoutesNum);
 
 // Geting the information thorugh Flask
 
+function loadData(data){
+    
+}
+
 async function initialize() {
-    const start = {"type": "start", "difficulty": 50} // change difficulty variable to number
+    const start = {"type": "start", "difficulty": difficulty}
     try{
         const response = await fetch('http://127.0.0.1:5000/main',{
             method: "POST",
@@ -145,32 +149,37 @@ async function initialize() {
     catch(error){
         console.log(error)
     }
-
 }
 
 // Rest of the functions
 
-function setDifficultyEasy() {
-    difficulty = "easy";
-    menu.style.display = "none";
-}
-
-function setDifficultyMedium() {
-    difficulty = "medium";
-    menu.style.display = "none";
-    data = initialize();
+function startGame(){
+    const data = initialize();
     initialize().then(data => {
-        console.log(data); // Ensure this logs the received data
+        console.log(data);
         console.log("Data received");
+        loadData(data);
     }).catch(error => {
         console.error("Error initializing:", error);
     });
-    
+}
+
+function setDifficultyEasy() {
+    difficulty = 0;
+    menu.style.display = "none";
+    startGame();
+}
+
+function setDifficultyMedium() {
+    difficulty = 50;
+    menu.style.display = "none";
+    startGame();
 }
 
 function setDifficultyHard() {
-    difficulty = "hard";
+    difficulty = 100;
     menu.style.display = "none";
+    startGame();
 }
 
 function reset() {
