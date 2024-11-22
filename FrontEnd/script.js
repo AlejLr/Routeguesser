@@ -96,7 +96,7 @@ function runAnimations() {
     }, 6000);
 }
 
-// Rest of the functionality
+// Initiallations
 
 let distance = 0;
 let difficulty = "medium";
@@ -121,6 +121,35 @@ startGame.onclick = hideStartScreen;
 
 routeNumber.addEventListener('input', updateRoutesNum);
 
+
+// Geting the information thorugh Flask
+
+async function initialize() {
+    const start = {"type": "start", "difficulty": 50} // change difficulty variable to number
+    try{
+        const response = await fetch('http://127.0.0.1:5000/main',{
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(start)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+    }
+    catch(error){
+        console.log(error)
+    }
+
+}
+
+// Rest of the functions
+
 function setDifficultyEasy() {
     difficulty = "easy";
     menu.style.display = "none";
@@ -129,6 +158,14 @@ function setDifficultyEasy() {
 function setDifficultyMedium() {
     difficulty = "medium";
     menu.style.display = "none";
+    data = initialize();
+    initialize().then(data => {
+        console.log(data); // Ensure this logs the received data
+        console.log("Data received");
+    }).catch(error => {
+        console.error("Error initializing:", error);
+    });
+    
 }
 
 function setDifficultyHard() {
@@ -140,6 +177,7 @@ function reset() {
     console.log("Resetting. Work in progress")
     path = [startMarker.getLatLng()]
     polyline.setLatLngs(path);
+
 }
 
 function updateRoutesNum() {
@@ -156,4 +194,9 @@ function hideStartScreen() {
     gameExplanation.style.display = "none";
     distanceReset.style.display = "block";
     menu.style.display = "block";
+}
+
+function updateDistance(addition) {
+    //distantce += addition;
+    scoreText.innerHTML = addition;
 }
