@@ -1,5 +1,5 @@
 /* Game Explanation, also called "A piece of art" */
-
+/*
 #gameExplanation {
     position: fixed;
     top: 0;
@@ -48,7 +48,7 @@
 #gameExplanation .content > * {
     margin: 10px 0;
 }
-
+*/
 /* In game items */
 #map{
     width: 100%;
@@ -161,7 +161,7 @@ input[type="number"]{
 
 
 /* Always on the end for not showing before the Game explanation */
-
+/*
 #menu,
 #distanceReset {
     display: none;

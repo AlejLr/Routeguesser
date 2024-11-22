@@ -1,5 +1,5 @@
 // Animations
-
+/*
 const g9 = document.getElementById('g9');
 const logo = document.getElementById('logo');
 const presents = document.getElementById('presents');
@@ -95,7 +95,7 @@ function runAnimations() {
         }, 1000);
     }, 6000);
 }
-
+*/
 // Initiallations
 
 let distance = 0;
@@ -186,6 +186,9 @@ function reset() {
     console.log("Resetting. Work in progress")
     path = [startMarker.getLatLng()]
     polyline.setLatLngs(path);
+    distance = 0;
+    scoreText.innerHTML = distance;
+    menu.style.display = "block";
 
 }
 
@@ -206,6 +209,6 @@ function hideStartScreen() {
 }
 
 function updateDistance(addition) {
-    //distantce += addition;
-    scoreText.innerHTML = addition;
+    distantce += addition;
+    scoreText.innerHTML = distance;
 }
