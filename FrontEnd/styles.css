@@ -1,4 +1,55 @@
+/* Game Explanation, also called "A piece of art" */
+/*
+#gameExplanation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+#logo{
+    width: 400px;
+    height: 350px;
+    margin-bottom: 20px;
+}
+#title, #subtitle, #startGame {
+    text-align: center;
+    margin: 10px 0; 
+}
+.hidden {
+    display: none;
+}
 
+.fade-in {
+    animation: fadeIn 1s forwards;
+}
+
+.fade-out {
+    animation: fadeOut 1s forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+#gameExplanation .content > * {
+    margin: 10px 0;
+}
+*/
+/* In game items */
 #map{
     width: 100%;
     height: 100vh;
@@ -23,12 +74,12 @@ body {
     background: rgba(255, 255, 255, 0.9);
     margin: 20px auto;
     padding: 10px;
-    border: 2px solid #cccccc;
+    border: 2px solid #000000e2;
     border-radius: 8px;
     z-index: 1000;
 }
 
-#undoScore {
+#distanceReset {
     position:absolute;
     display: inline-block;
     text-align: center;
@@ -46,7 +97,7 @@ body {
     gap: 10px;*/
 }
 
-#undo {
+#reset {
     padding: 5px 10px;
 }
 
@@ -106,4 +157,12 @@ legend {
 
 input[type="number"]{
     width: 25%;
+}
+
+
+/* Always on the end for not showing before the Game explanation */
+/*
+#menu,
+#distanceReset {
+    display: none;
 }
