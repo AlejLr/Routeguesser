@@ -1,0 +1,4 @@
+flask==2.x.x
+flask-cors==x.x.x
+matplotlib==x.x.x
+networkx==x.x.x
