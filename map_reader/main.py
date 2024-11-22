@@ -1,7 +1,6 @@
-import Map
+from Map import Map
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-
 app = Flask(__name__)
 CORS(app)
 
@@ -9,14 +8,22 @@ CORS(app)
 
 class SendData:
     def __init__(self, data):
-        self.map = Map("complex_graph.json")
-        data["difficulty"] = self.map.difficulty
+        self.map = Map("complex_graph.json", data["difficulty"])
 
     def send_start(self):
         """
         sends the start, end and blocked nodes to the UI in a JSON file
         """
-        return jsonify({"start" : self.map.start, "end" : self.map.end, "blocked nodes": self.map.blocked_roads, "neighbours": self.map.get_neighbours_and_roads(self.map.current_pos), "optimal path" :  self.map.optimal_path, "optimal distance" : self.map.optimal_distance})
+        # Quick and messy handling 
+        neighbours = self.map.get_neighbours_and_roads(self.map.current_pos)
+        neighbours_str_keys = {str(k): v for k, v in neighbours.items()}
+        
+        return jsonify({"start" : self.map.start, 
+                        "end" : self.map.end, 
+                        "blocked nodes": self.map.blocked_roads, 
+                        "neighbours": neighbours_str_keys, #self.map.get_neighbours_and_roads(self.map.current_pos), 
+                        "optimal path" :  self.map.optimal_path, 
+                        "optimal distance" : self.map.optimal_distance})
 
     def send_neighbours(self, data):
         """
@@ -32,6 +39,9 @@ def main():
     processes the inputs from the webpage
     """
     data = request.get_json()
+    
+    print("Received data:", data)  # Debugging :)
+    
     if data["type"] == "start":
         # initialize the map object and return the starting information for the frontend
         send_data = SendData(data)
@@ -44,11 +54,7 @@ def main():
 
 
 if __name__ == "__main__":
-    while True:
-        app.run(debug=True)
-        data = request.get_json()
-        if data["type"] == "end":
-            break
+    app.run(debug=True)
 
 # testing if some functions work properly
 # Graph = gr.GeoGraph("map_complex.geojson")
