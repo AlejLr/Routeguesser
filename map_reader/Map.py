@@ -68,6 +68,7 @@ class Map:
             # List of the possible edges and list of edges that will be removed from original graph
             possible_edges = list(copy_g.edges())
             removable_edges = []
+            removable_roads = []
 
             # While the goal is not yet reached
             while len(removable_edges) < number_of_blocked_nodes:
@@ -80,9 +81,12 @@ class Map:
                 possible_edges.remove(try_remove)
 
                 # Remove it from the graph copy and check if it remains connected, otherwise add it back to retry
+                removable_road = copy_g[try_remove[0]][try_remove[1]]["road"]
                 copy_g.remove_edge(*try_remove)
+
                 if len(list(nx.connected_components(copy_g))) < 2:
                     removable_edges.append(try_remove)
+                    removable_roads.append(removable_road)
                 else:
                     copy_g.add_edge(*try_remove)
 
@@ -90,7 +94,7 @@ class Map:
             for edge in removable_edges:
                 self.Graph[edge[0]][edge[1]]['blocked'] = True
 
-            return removable_edges
+            return removable_roads
 
         # Add more specific exceptions
         except Exception as e:
