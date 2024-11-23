@@ -116,6 +116,8 @@ const hardButton = document.querySelector('#hard');
 const menu = document.querySelector('#menu');
 const routeNumber = document.querySelector('#routeNumber');
 const resetButton = document.querySelector('#reset');
+const rebootButton = document.querySelector('#reboot');
+const endRoundButton = document.querySelector('#endRound');
 const distanceReset = document.querySelector('#distanceReset');
 
 
@@ -124,6 +126,8 @@ easyButton.onclick = setDifficultyEasy;
 mediumButton.onclick = setDifficultyMedium;
 hardButton.onclick = setDifficultyHard;
 resetButton.onclick = resetGame;
+rebootButton.onclick = startNewRound;
+endRoundButton.onclick = endRound;
 startGame.onclick = hideStartScreen;
 
 routeNumber.addEventListener('input', updateRoutesNum);
@@ -235,4 +239,14 @@ function hideStartScreen() {
 function updateDistance(addition) {
     distance += addition;
     scoreText.innerHTML = distance;
+}
+
+function requestNeighbours(coords) {
+    // do.something(idk);
+    neighbours = neighbours // for now
+    showNeighbours();
+}
+
+function endRound() {
+    console.log("Round ended. Score: ", 100*distance/optimalDistance)
 }
