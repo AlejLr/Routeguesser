@@ -193,7 +193,7 @@ class Map:
 
         for neighbour in list(self.Graph.neighbors(node)):
             if (self.Graph[node][neighbour]["blocked"] is False) or (exclude_blocked is False):
-                neighbour_and_roads.append([neighbor, self.Graph[node][neighbour]["road"], Decimal(self.Graph[node][neighbour]["dist"]) * Decimal(10000)])
+                neighbour_and_roads.append([neighbour, self.Graph[node][neighbour]["road"], Decimal(self.Graph[node][neighbour]["dist"]) * Decimal(10000)])
 
         return neighbour_and_roads
 
