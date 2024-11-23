@@ -239,13 +239,14 @@ function hideStartScreen() {
 }
 
 function updateDistance(addition) {
-    distance += addition;
+    console.log(addition, typeof(addition))
+    distance += parseFloat(addition);
     scoreText.innerHTML = distance;
 }
 
 function requestNeighbours(coords) {
     // do.something(idk);
-    neighbours = newNeighbours // for now
+    neighbours = neighbours // for now
     showNeighbours();
 }
 

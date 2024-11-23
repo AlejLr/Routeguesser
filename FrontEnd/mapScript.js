@@ -15,9 +15,7 @@
 
 
 // This function initialises the map at the start. It should only be called once at the start
-let map = L.map('map', {maxZoom: 19, minZoom:15, maxBounds: [[52.13, 4.455],[52.19, 4.53]], zoom: 17, center: [52.1581218,4.4855674]});
-let path;
-let detailedPath;
+let map = L.map('map', {maxZoom: 18, minZoom:15, maxBounds: [[52.13, 4.455],[52.19, 4.53]], zoom: 15, center: [52.1581218,4.4855674]});
 
 // Show map layer
 mapLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -26,51 +24,85 @@ attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreet
 
 //Create circleIcon
 circleIcon = L.icon({
-iconUrl: 'circle_icon.png',
-iconSize: [16, 16],
-iconAnchor: [8, 8],
-popupAnchor: [8, 8]
+    iconUrl: 'circle_icon.png',
+    iconSize: [16, 16],
+    iconAnchor: [8, 8],
+    popupAnchor: [8, 8]
+});
+
+//Create startIcon
+startIcon = L.icon({
+    iconUrl: 'start_marker_icon.png',
+    iconSize: [32, 48],
+    iconAnchor: [16, 24],
+    popupAnchor:  [16, 24]
+});
+
+//Create endIcon
+endIcon = L.icon({
+    iconUrl: 'end_marker_icon.png',
+    iconSize: [32, 48],
+    iconAnchor: [16, 24],
+    popupAnchor:  [16, 24]
 });
 
 // Shows the new optimal path (it shows it from the start for now. This is not permanent) and the new blocked roads (called blocked nodes, but they are roads)
 function startNewRound() {
     optimalPathLine = L.polyline(optimalPath, {color: '#ffffff'});
-    
+
     // blockedRoads is the list of all roads that can't be traversed due to being blocked
     // let blockedRoads = [[[52.159,4.491],[52.16,4.492]]];
     blockedNodes.forEach(function(blockedRoad) {
-        console.log(blockedRoad);
+        // console.log(blockedRoad);
         L.polyline(blockedRoad, {color: '#dd0000'}).addTo(map);
     });
 
     startMarker = L.marker(start).addTo(map).bindPopup("Start");
-    endMarker = L.marker(end).addTo(map).bindPopup("End");
+    endMarker = L.marker(end, {icon: endIcon}).addTo(map).bindPopup("End");
     neighbourMarkers = [];
 
+    path = [startMarker.getLatLng()];
+    detailedPath = [];
+
+    pathLine = L.polyline(detailedPath).addTo(map);
+
     console.log(neighbours);
-    showNeighbours();
+    showNeighbours(path, detailedPath);
 }
 
 
 // Shows adjacent neighbours in the map and makes them clickable
 function showNeighbours() {
     neighbourMarkers.forEach(function(marker) {marker.remove()});
-    neighbourSubpaths = [];
+    let neighbourSubpaths = [];
+    neighbours.forEach(function(tuple) {
+        let endPoint = tuple[0],
+        subpath = tuple[1],
+        distance = tuple[2];
 
-    neighbours.forEach(function(endPoint, subpath, distance) {
-        let marker = L.marker(endPoint, {icon: circleIcon}).addTo(map).bindPopup();
+        // console.log("Neighbour:", endPoint, subpath, distance);
+        let marker = L.marker([parseFloat(endPoint[0]), parseFloat(endPoint[1])], {icon: circleIcon}).addTo(map).bindPopup("");
         neighbourMarkers.push(marker);
-        neighboursubpaths.push(subpath)
+        neighbourSubpaths.push(subpath)
         marker.on('click', function(e) {
             path.forEach(function(node) {
                 if (e.latlng.equals(node)) {
                     L.polyline([e.latlng, path.at(-1)], {color: '#343434'}).addTo(map);
                 }
             });
-            detailedPath.pushValues(neighbourSubpaths[neighbourMarkers.index(e)]);
-            detailedPath.push([e.latlng[0], e.latlng[1]]);
+            let i = 0;
+            for (neighbourMarker of neighbourMarkers) {
+                if (neighbourMarker.getLatLng().equals(e.latlng)) {
+                    detailedPath = detailedPath.concat(neighbourSubpaths[i]);
+                    break;
+                }
+                i++;
+            }
+            // detailedPath.push([e.latlng.lat, e.latlng.lng]);
             path.push(e.latlng);
-            polyline.setLatLngs(detailedPath);
+            console.log(detailedPath);
+            console.log(path);
+            pathLine.setLatLngs(detailedPath);
             marker.closePopup();
             
             updateDistance(distance);
