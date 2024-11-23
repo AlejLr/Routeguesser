@@ -26,7 +26,7 @@ def file_cleaner(in_file_name, out_file_name):
         gjson_objs = gjson["features"]
         for obj_dict in gjson_objs:
             if obj_dict["geometry"]["type"] == 'LineString':
-                road = [tuple(x) for x in obj_dict["geometry"]["coordinates"]]
+                road = [(y, x) for x, y in obj_dict["geometry"]["coordinates"]]
                 # skip circular roads
                 if road[0] == road[-1]:
                     continue

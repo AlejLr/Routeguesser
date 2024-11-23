@@ -189,11 +189,11 @@ class Map:
 
         if node is None:
             node = self.current_pos
-        neighbour_and_roads = {}
+        neighbour_and_roads = []
 
         for neighbour in list(self.Graph.neighbors(node)):
             if (self.Graph[node][neighbour]["blocked"] is False) or (exclude_blocked is False):
-                neighbour_and_roads[neighbour] = (self.Graph[node][neighbour]["road"], Decimal(self.Graph[node][neighbour]["dist"]) * Decimal(10000))
+                neighbour_and_roads.append([neighbors, self.Graph[node][neighbour]["road"], Decimal(self.Graph[node][neighbour]["dist"]) * Decimal(10000)])
 
         return neighbour_and_roads
 
