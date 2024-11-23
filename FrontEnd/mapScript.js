@@ -47,7 +47,7 @@ function startNewRound() {
     endMarker = L.marker(end).addTo(map).bindPopup("End");
     neighbourMarkers = [];
 
-    showNeighbours();
+    //showNeighbours();
 }
 
 
@@ -80,7 +80,14 @@ function showNeighbours() {
             }
             else requestNeighbours([e.latlng[0], e.latlng[1]]);
         });
-        
+
     })
 }
 
+// Alex testing spot
+
+function test(){
+    optimalPathLine = L.polyline(optimalPath).addTo(map);
+    console.log("Optimal path: ", optimalPath);
+    console.log("Optimal path created");
+}

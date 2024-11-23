@@ -178,15 +178,18 @@ async function initializeFlask() {
 
 // Rest of the functions
 
-function startGame(){
-    const data = initializeFlask();
-    initializeFlask().then(data => {
+async function startGame(){
+    try{
+        const data = await initializeFlask();
         console.log(data);
         console.log("Data received");
         loadData(data);
-    }).catch(error => {
+        startNewRound();
+        test();
+    }
+    catch(error){
         console.error("Error initializing:", error);
-    });
+    }
 }
 
 function setDifficultyEasy() {
@@ -216,7 +219,6 @@ function resetGame() {
 
     path = [startMarker.getLatLng()]
     polyline.setLatLngs(path);
-    
 
 }
 
@@ -243,7 +245,7 @@ function updateDistance(addition) {
 
 function requestNeighbours(coords) {
     // do.something(idk);
-    neighbours = neighbours // for now
+    neighbours = newNeighbours // for now
     showNeighbours();
 }
 
