@@ -47,7 +47,8 @@ function startNewRound() {
     endMarker = L.marker(end).addTo(map).bindPopup("End");
     neighbourMarkers = [];
 
-    //showNeighbours();
+    console.log(neighbours);
+    showNeighbours();
 }
 
 
