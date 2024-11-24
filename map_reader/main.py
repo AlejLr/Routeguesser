@@ -5,35 +5,26 @@ app = Flask(__name__)
 CORS(app)
 
 
-class SendData:
-    def __init__(self, data):
-        
-        self.map = Map("complex_graph.json", data["difficulty"])
-        #self.round = 0
 
-    def send_start(self):
-        """
-        sends the start, end and blocked nodes to the UI in a JSON file
-        Keep tracks of the round to reset start and end when needed
-        """
+def send_start(data):
+    """
+    sends the start, end and blocked nodes to the UI in a JSON file
+    Keep tracks of the round to reset start and end when needed
+    """
+    map = Map("complex_graph.json", data["type"], data["difficulty"])
+    return jsonify({"start" : map.start, 
+                    "end" : map.end, 
+                    "blocked nodes": map.blocked_roads, 
+                    "neighbours": map.get_neighbours_and_roads(map.current_pos), 
+                    "optimal path" :  map.optimal_path, 
+                    "optimal distance" : map.optimal_distance})
 
-        #if self.round > 1:
-        #    self.map.new_round()
-        #self.round += 1
-
-        return jsonify({"start" : self.map.start, 
-                        "end" : self.map.end, 
-                        "blocked nodes": self.map.blocked_roads, 
-                        "neighbours": self.map.get_neighbours_and_roads(self.map.current_pos), 
-                        "optimal path" :  self.map.optimal_path, 
-                        "optimal distance" : self.map.optimal_distance})
-
-    def send_neighbours(self, data):
-        """
-        calls generate neighbours and sends to the UI a JSON file with them
-        """
-        self.map.process_inputs(data["current"])
-        return jsonify({"neighbours": self.map.get_neighbours_and_roads(self.map.current_pos)})
+def send_neighbours(data):
+    """
+    calls generate neighbours and sends to the UI a JSON file with them
+    """
+    map = Map("complex_graph.json", data["type"])
+    return jsonify({"neighbours": map.get_neighbours_and_roads(data["current"])})
 
 
 @app.route('/main', methods=['POST'])
@@ -45,13 +36,12 @@ def main():
     
     print("Received data:", data)  # Debugging :)
     
-    send_data = SendData(data)
     
     if data["type"] == "start":
         # initialize the map object and return the starting information for the frontend
-        return send_data.send_start()
+        return send_start(data)
     elif data["type"] == "neighbours":
-        return send_data.send_neighbours(data)
+        return send_neighbours(data)
  
     
     return jsonify({"error" : "The data is not a JSON or the format is invalid"}), 400

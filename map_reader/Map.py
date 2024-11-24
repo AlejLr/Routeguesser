@@ -17,21 +17,21 @@ class Map:
     (CONSIDER) The greater Map will be composed by multiple smaller Maps so that we can work in chunks based on zoom in.
     """
 
-    def __init__(self, graph_file, difficulty=50):
+    def __init__(self, graph_file, dtype, difficulty=50):
         """
         also generates the blocked nodes
         """
         self.Graph = self._create_graph(graph_file)
+        if dtype == "start":
+            self.number_of_blocked_roads = difficulty
+            self.blocked_roads = self.generate_blocked_roads(self.number_of_blocked_roads)
+            
+            self.score = 0
 
-        self.number_of_blocked_roads = difficulty
-        self.blocked_roads = self.generate_blocked_roads(self.number_of_blocked_roads)
-        
-        self.score = 0
+            self.start, self.end = self.generate_start_end()
+            self.current_pos = self.start
 
-        self.start, self.end = self.generate_start_end()
-        self.current_pos = self.start
-
-        self.optimal_path, self.optimal_distance = self.astar()
+            self.optimal_path, self.optimal_distance = self.astar()
     
     def new_round(self):
         self.start = self.end
@@ -193,7 +193,7 @@ class Map:
         return path[::-1], path_distance
 
 
-    def get_neighbours_and_roads(self, node=None, exclude_blocked=True):
+    def get_neighbours_and_roads(self, node):
         """Generates a dictionary of neighbouring nodes for each node in the graph.
         The key are the neighbour nodes, the values the list of coordinates in between
         By default, it returns the neighbours of the current position
@@ -206,14 +206,14 @@ class Map:
         rtype: dict(G.node, tuple(list(Graph.node), float))
         """
 
-        if node is None:
-            node = self.current_pos
+        # if node is None:
+        #     node = self.current_pos
 
         neighbour_and_roads = []
         node = tuple(node)
         for neighbour in list(self.Graph.neighbors(node)):
-            if (self.Graph[node][neighbour]["blocked"] is False) or (exclude_blocked is False):
-                neighbour_and_roads.append([neighbour, self.Graph[node][neighbour]["road"], Decimal(self.Graph[node][neighbour]["dist"]) * Decimal(10000)])
+            # if (self.Graph[node][neighbour]["blocked"] is False) or (exclude_blocked is False):
+            neighbour_and_roads.append([neighbour, self.Graph[node][neighbour]["road"], Decimal(self.Graph[node][neighbour]["dist"]) * Decimal(10000)])
 
         return neighbour_and_roads
 
