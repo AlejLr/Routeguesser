@@ -7,8 +7,9 @@ CORS(app)
 
 class SendData:
     def __init__(self, data):
+        
         self.map = Map("complex_graph.json", data["difficulty"])
-        self.round = 0
+        #self.round = 0
 
     def send_start(self):
         """
@@ -16,9 +17,9 @@ class SendData:
         Keep tracks of the round to reset start and end when needed
         """
 
-        if self.round > 1:
-            self.map.new_round()
-        self.round += 1
+        #if self.round > 1:
+        #    self.map.new_round()
+        #self.round += 1
 
         return jsonify({"start" : self.map.start, 
                         "end" : self.map.end, 
@@ -32,7 +33,7 @@ class SendData:
         calls generate neighbours and sends to the UI a JSON file with them
         """
         self.map.process_inputs(data["current"])
-        return jsonify({self.map.get_neighbours_and_roads(self.map.current_pos)})
+        return jsonify({"neighbours": self.map.get_neighbours_and_roads(self.map.current_pos)})
 
 
 @app.route('/main', methods=['POST'])

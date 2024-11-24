@@ -32,7 +32,7 @@ class Map:
         self.current_pos = self.start
 
         self.optimal_path, self.optimal_distance = self.astar()
-
+    
     def new_round(self):
         self.start = self.end
         self.end = self.generate_end()
@@ -208,8 +208,9 @@ class Map:
 
         if node is None:
             node = self.current_pos
-        neighbour_and_roads = []
 
+        neighbour_and_roads = []
+        node = tuple(node)
         for neighbour in list(self.Graph.neighbors(node)):
             if (self.Graph[node][neighbour]["blocked"] is False) or (exclude_blocked is False):
                 neighbour_and_roads.append([neighbour, self.Graph[node][neighbour]["road"], Decimal(self.Graph[node][neighbour]["dist"]) * Decimal(10000)])
@@ -266,4 +267,3 @@ class Map:
 # print(f"OPTIMAL PATH: {optimal_path}")
 # print(f"OPTIMAL PATH DISTANCE: {map.optimal_distance}")
 # map.__visualize__(optimal_path)
-    
