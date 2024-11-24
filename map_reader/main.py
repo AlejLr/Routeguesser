@@ -8,12 +8,18 @@ CORS(app)
 class SendData:
     def __init__(self, data):
         self.map = Map("complex_graph.json", data["difficulty"])
+        self.round = 0
 
     def send_start(self):
         """
         sends the start, end and blocked nodes to the UI in a JSON file
+        Keep tracks of the round to reset start and end when needed
         """
-        
+
+        if self.round > 1:
+            self.map.new_round()
+        self.round += 1
+
         return jsonify({"start" : self.map.start, 
                         "end" : self.map.end, 
                         "blocked nodes": self.map.blocked_roads, 

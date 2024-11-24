@@ -33,6 +33,13 @@ class Map:
 
         self.optimal_path, self.optimal_distance = self.astar()
 
+    def new_round(self):
+        self.start = self.end
+        self.end = self.generate_end()
+        self.current_pos = self.start
+        self.optimal_path, self.optimal_distance = self.astar()
+
+
     def _create_graph(self, graph_file):
         # NetworkX fills in the nodes
         # ROADS are lists of lists, but this can be changed in the future
@@ -100,7 +107,6 @@ class Map:
         except Exception as e:
             raise e
 
-
     def reset_blocked_roads(self):
         nx.set_edge_attributes(self.Graph, False, name="blocked")
         return None
@@ -115,7 +121,16 @@ class Map:
                 break
 
         return start, end
+    def generate_end(self, min_distance=100):
+        """generate a start node randomly from the graph, which must have a minimum distance between them
+                rtype:  (tuple(int, int))"""
+        nodes = list(self.Graph.nodes)
+        while True:
+            end = random.choice(nodes)
+            if self.calculate_cartesian_distance(self.start, end) * Decimal(10000) >= Decimal(min_distance):
+                break
 
+        return end
     def __repr__(self):
         return f"Current: {self.current_pos}, Start: {self.start}, End:{self.end}, number of blocked roads:{self.number_of_blocked_roads}"
 
