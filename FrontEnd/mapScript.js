@@ -48,14 +48,14 @@ endIcon = L.icon({
 
 // Shows the new optimal path (it shows it from the start for now. This is not permanent) and the new blocked roads (called blocked nodes, but they are roads)
 function startNewRound() {
-    optimalPathLine = L.polyline(optimalPath, {color: '#ffffff'});
-
+    optimalPathLine = L.polyline(optimalPath, {color: '#78a100'});
+    console.log("optimalPath:", optimalPath);
     // blockedRoads is the list of all roads that can't be traversed due to being blocked
     // let blockedRoads = [[[52.159,4.491],[52.16,4.492]]];
-    blockedNodes.forEach(function(blockedRoad) {
+    for (blockedRoad of blockedNodes) {
         // console.log(blockedRoad);
         L.polyline(blockedRoad, {color: '#dd0000'}).addTo(map);
-    });
+    }
 
     startMarker = L.marker(start).addTo(map).bindPopup("Start");
     endMarker = L.marker(end, {icon: endIcon}).addTo(map).bindPopup("End");
@@ -64,7 +64,7 @@ function startNewRound() {
     path = [startMarker.getLatLng()];
     detailedPath = [];
 
-    pathLine = L.polyline(detailedPath).addTo(map);
+    pathLine = L.polyline(detailedPath, {color: '#2e80d1'}).addTo(map);
 
     console.log(neighbours);
     showNeighbours(path, detailedPath);
@@ -74,36 +74,34 @@ function startNewRound() {
 // Shows adjacent neighbours in the map and makes them clickable
 function showNeighbours() {
     neighbourMarkers.forEach(function(marker) {marker.remove()});
+    neighbourMarkers = [];
     let neighbourSubpaths = [];
-    neighbours.forEach(function(tuple) {
-        let endPoint = tuple[0],
-        subpath = tuple[1],
-        distance = tuple[2];
-
+    for (trio of neighbours) {
+        let endPoint = trio[0],
+        subpath = trio[1],
+        distance = trio[2];
+        console.log(trio)
         // console.log("Neighbour:", endPoint, subpath, distance);
         let marker = L.marker([parseFloat(endPoint[0]), parseFloat(endPoint[1])], {icon: circleIcon}).addTo(map).bindPopup("");
         neighbourMarkers.push(marker);
-        neighbourSubpaths.push(subpath)
-        console.log("subpath: ",neighbourSubpaths);
+        neighbourSubpaths.push(subpath);
+        // console.log("subpath: ",neighbourSubpaths);
         marker.on('click', function(e) {
-            path.forEach(function(node) {
-                if (e.latlng.equals(node)) {
-                    L.polyline([e.latlng, path.at(-1)], {color: '#343434'}).addTo(map);
-                }
-            });
+            // console.log("neighbourMarkers:", neighbourMarkers);
+            // console.log("neighbourSubpaths:", neighbourSubpaths);
             let i = 0;
             for (neighbourMarker of neighbourMarkers) {
                 if (neighbourMarker.getLatLng().equals(e.latlng)) {
-                    detailedPath = detailedPath.concat(neighbourSubpaths[i]);
+                    for (subnode of neighbourSubpaths[i]) {detailedPath.push(subnode)};
                     break;
                 }
                 i++;
             }
             // detailedPath.push([e.latlng.lat, e.latlng.lng]);
             path.push(e.latlng);
-            console.log(detailedPath);
-            console.log(path);
-            pathLine.setLatLngs(path);
+            // console.log("detailedPath:", detailedPath);
+            // console.log("path:", path);
+            pathLine.setLatLngs(detailedPath);
             marker.closePopup();
             
             updateDistance(distance);
@@ -117,13 +115,13 @@ function showNeighbours() {
             }
         });
 
-    })
+    }
 }
 
 // Alex testing spot
 
 function test(){
-    optimalPathLine = L.polyline(optimalPath).addTo(map);
+    optimalPathLine = L.polyline(optimalPath, {color: '#78a100'}).addTo(map);
     console.log("Optimal path: ", optimalPath);
     console.log("Optimal path created");
 }
