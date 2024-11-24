@@ -44,9 +44,10 @@ def main():
     
     print("Received data:", data)  # Debugging :)
     
+    send_data = SendData(data)
+    
     if data["type"] == "start":
         # initialize the map object and return the starting information for the frontend
-        send_data = SendData(data)
         return send_data.send_start()
     elif data["type"] == "neighbours":
         return send_data.send_neighbours(data)
