@@ -84,6 +84,7 @@ function showNeighbours() {
         let marker = L.marker([parseFloat(endPoint[0]), parseFloat(endPoint[1])], {icon: circleIcon}).addTo(map).bindPopup("");
         neighbourMarkers.push(marker);
         neighbourSubpaths.push(subpath)
+        console.log("subpath: ",neighbourSubpaths);
         marker.on('click', function(e) {
             path.forEach(function(node) {
                 if (e.latlng.equals(node)) {
@@ -102,7 +103,7 @@ function showNeighbours() {
             path.push(e.latlng);
             console.log(detailedPath);
             console.log(path);
-            pathLine.setLatLngs(detailedPath);
+            pathLine.setLatLngs(path);
             marker.closePopup();
             
             updateDistance(distance);

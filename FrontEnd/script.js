@@ -209,7 +209,7 @@ async function startGame(){
         console.log("Data received");
         loadData(data);
         startNewRound();
-        //test();
+        test();
     }
     catch(error){
         console.error("Error initializing:", error);
