@@ -17,22 +17,28 @@ class Map:
     (CONSIDER) The greater Map will be composed by multiple smaller Maps so that we can work in chunks based on zoom in.
     """
 
-    def __init__(self, graph_file, dtype, difficulty=50):
+    def __init__(self, graph_file, difficulty=50):
         """
         also generates the blocked nodes
         """
         self.Graph = self._create_graph(graph_file)
-        if dtype == "start":
 
-            self.number_of_blocked_roads = difficulty
-            self.blocked_roads = self.generate_blocked_roads(self.number_of_blocked_roads)
-            
-            self.score = 0
+        self.number_of_blocked_roads = difficulty
+        self.blocked_roads = self.generate_blocked_roads(self.number_of_blocked_roads)
+        
+        self.score = 0
 
-            self.start, self.end = self.generate_start_end()
-            self.current_pos = self.start
+        self.start, self.end = self.generate_start_end()
+        self.current_pos = self.start
 
-            self.optimal_path, self.optimal_distance = self.astar()
+        self.optimal_path, self.optimal_distance = self.astar()
+    
+    def new_round(self):
+        self.start = self.end
+        self.end = self.generate_end()
+        self.current_pos = self.start
+        self.optimal_path, self.optimal_distance = self.astar()
+
 
     def _create_graph(self, graph_file):
         # NetworkX fills in the nodes
@@ -69,6 +75,7 @@ class Map:
             # List of the possible edges and list of edges that will be removed from original graph
             possible_edges = list(copy_g.edges())
             removable_edges = []
+            removable_roads = []
 
             # While the goal is not yet reached
             while len(removable_edges) < number_of_blocked_nodes:
@@ -81,9 +88,12 @@ class Map:
                 possible_edges.remove(try_remove)
 
                 # Remove it from the graph copy and check if it remains connected, otherwise add it back to retry
+                removable_road = copy_g[try_remove[0]][try_remove[1]]["road"]
                 copy_g.remove_edge(*try_remove)
+
                 if len(list(nx.connected_components(copy_g))) < 2:
                     removable_edges.append(try_remove)
+                    removable_roads.append(removable_road)
                 else:
                     copy_g.add_edge(*try_remove)
 
@@ -91,12 +101,11 @@ class Map:
             for edge in removable_edges:
                 self.Graph[edge[0]][edge[1]]['blocked'] = True
 
-            return removable_edges
+            return removable_roads
 
         # Add more specific exceptions
         except Exception as e:
             raise e
-
 
     def reset_blocked_roads(self):
         nx.set_edge_attributes(self.Graph, False, name="blocked")
@@ -112,7 +121,16 @@ class Map:
                 break
 
         return start, end
+    def generate_end(self, min_distance=100):
+        """generate a start node randomly from the graph, which must have a minimum distance between them
+                rtype:  (tuple(int, int))"""
+        nodes = list(self.Graph.nodes)
+        while True:
+            end = random.choice(nodes)
+            if self.calculate_cartesian_distance(self.start, end) * Decimal(10000) >= Decimal(min_distance):
+                break
 
+        return end
     def __repr__(self):
         return f"Current: {self.current_pos}, Start: {self.start}, End:{self.end}, number of blocked roads:{self.number_of_blocked_roads}"
 
@@ -174,8 +192,8 @@ class Map:
         # the path is reversed at first, so we need to undo this operation
         return path[::-1], path_distance
 
-    
-    def get_neighbours_and_roads(self, node):
+
+    def get_neighbours_and_roads(self, node=None, exclude_blocked=True):
         """Generates a dictionary of neighbouring nodes for each node in the graph.
         The key are the neighbour nodes, the values the list of coordinates in between
         By default, it returns the neighbours of the current position
@@ -188,13 +206,24 @@ class Map:
         rtype: dict(G.node, tuple(list(Graph.node), float))
         """
 
-        neighbour_and_roads = {}
+        if node is None:
+            node = self.current_pos
 
+        neighbour_and_roads = []
+        node = tuple(node)
         for neighbour in list(self.Graph.neighbors(node)):
-            neighbour_and_roads[neighbour] = (self.Graph[node][neighbour]["road"], Decimal(self.Graph[node][neighbour]["dist"]) * Decimal(10000))
+            if (self.Graph[node][neighbour]["blocked"] is False) or (exclude_blocked is False):
+                neighbour_and_roads.append([neighbour, self.Graph[node][neighbour]["road"], Decimal(self.Graph[node][neighbour]["dist"]) * Decimal(10000)])
 
         return neighbour_and_roads
 
+
+    def process_inputs(self, next_node):
+        """
+        changes the current_pos
+        (no need to change the score, as it is calculated in front end)
+        """
+        self.current_pos = next_node
 
     @staticmethod
     def calculate_cartesian_distance(node1, node2):
@@ -238,4 +267,3 @@ class Map:
 # print(f"OPTIMAL PATH: {optimal_path}")
 # print(f"OPTIMAL PATH DISTANCE: {map.optimal_distance}")
 # map.__visualize__(optimal_path)
-    
