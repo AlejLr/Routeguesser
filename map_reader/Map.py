@@ -182,6 +182,7 @@ class Map:
         returns the optimal path from the start to the end, using self.__history__
         rtype: list(Graph.node)
         """
+        # TODO
         path = []
         current = end
         path_distance = self.__history__[end][1]
@@ -189,9 +190,28 @@ class Map:
             path.append(current)
             current = self.__history__[current][0]
 
-        # the path is reversed at first, so we need to undo this operation
-        return path[::-1], path_distance
+        path = path[::-1]
+        # complete_road = [list(path[0])]
+        # previous = path[0]
+        # for node in path[1:]:
+        #     complete_road.extend(self.Graph[previous][node]["road"][1:])
+        #     previous = node
 
+        # the path is reversed at first, so we need to undo this operation
+        return path, path_distance
+    
+    # def get_edges_for_path(self, path):
+
+    #     new_path = [path[0]]
+    #     previous = path[0]
+    #     for node in path:
+    #         if node != previous:
+    #             temp = self.Graph[node][previous]["road"]
+    #             temp.pop(0)
+    #             new_path.extend(temp)
+    #         previous = node
+        
+    #     return new_path
 
     def get_neighbours_and_roads(self, node):
         """Generates a dictionary of neighbouring nodes for each node in the graph.
@@ -259,11 +279,11 @@ class Map:
 
 # some testing code, uncomment to visualize a path on a graph with random start and end
 # print("TESTING")
-# map = Map("complex_graph.json")
+# map = Map("complex_graph.json", "start", 50)
 # current = list(map.Graph.nodes)[0]
 # start, end = map.start, map.end
 # print(f"START: {start}, END: {end}")
 # optimal_path = map.optimal_path
 # print(f"OPTIMAL PATH: {optimal_path}")
 # print(f"OPTIMAL PATH DISTANCE: {map.optimal_distance}")
-# map.__visualize__(optimal_path)
+# map.__visualize__()

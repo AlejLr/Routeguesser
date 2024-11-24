@@ -45,7 +45,7 @@ def euclidean_dist(node1, node2):
 def dist(points):
     return sum(euclidean_dist(points[i], points[i + 1]) for i in range(len(points) - 1))
 
-file_cleaner("map_complex.geojson", "complex_graph.json")
+file_cleaner("map_complete.geojson", "complex_graph.json")
 
 
 
