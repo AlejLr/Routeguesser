@@ -176,6 +176,29 @@ async function initializeFlask() {
     }
 }
 
+async function requestNeighbours(coords) {
+    const neighbours = {"type": "neighbours", "current": coords, "difficulty": difficulty}
+    try{
+        const response = await fetch('http://127.0.0.1:5000/main',{
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(neighbours)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Neighbors: " + data);
+    }
+    catch(error){
+        console.log(error)
+    }
+}
+
 // Rest of the functions
 
 async function startGame(){
@@ -244,12 +267,7 @@ function updateDistance(addition) {
     scoreText.innerHTML = distance;
 }
 
-function requestNeighbours(coords) {
-    // do.something(idk);
-    neighbours = neighbours // for now
-    showNeighbours();
-}
-
 function endRound() {
     console.log("Round ended. Score: ", 100*distance/optimalDistance)
+    requestNeighbours(end);
 }
