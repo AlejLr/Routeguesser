@@ -111,7 +111,9 @@ function showNeighbours() {
                 optimalPathLine.addTo(map);
                 endRound();
             }
-            else requestNeighbours([e.latlng[0], e.latlng[1]]);
+            else {
+                requestNeighbours([e.latlng["lat"], e.latlng["lng"]]);
+            }
         });
 
     })

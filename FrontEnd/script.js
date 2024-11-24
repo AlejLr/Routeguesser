@@ -177,14 +177,14 @@ async function initializeFlask() {
 }
 
 async function requestNeighbours(coords) {
-    const neighbours = {"type": "neighbours", "current": coords, "difficulty": difficulty}
+    const send_neighbours = {"type": "neighbours", "current": coords, "difficulty": difficulty}
     try{
         const response = await fetch('http://127.0.0.1:5000/main',{
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(neighbours)
+            body: JSON.stringify(send_neighbours)
         });
 
         if (!response.ok) {
@@ -192,7 +192,8 @@ async function requestNeighbours(coords) {
         }
 
         const data = await response.json();
-        console.log("Neighbors: " + data);
+        neighbours = data["neighbours"];
+        showNeighbours();
     }
     catch(error){
         console.log(error)
@@ -268,6 +269,5 @@ function updateDistance(addition) {
 }
 
 function endRound() {
-    console.log("Round ended. Score: ", 100*distance/optimalDistance)
-    requestNeighbours(end);
+    console.log("Round ended. Score: ", 100*distance/optimalDistance);
 }

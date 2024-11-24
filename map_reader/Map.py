@@ -214,7 +214,7 @@ class Map:
         for neighbour in list(self.Graph.neighbors(node)):
             # if (self.Graph[node][neighbour]["blocked"] is False) or (exclude_blocked is False):
             neighbour_and_roads.append([neighbour, self.Graph[node][neighbour]["road"], Decimal(self.Graph[node][neighbour]["dist"]) * Decimal(10000)])
-
+        #print("Roads:", neighbour_and_roads)
         return neighbour_and_roads
 
 

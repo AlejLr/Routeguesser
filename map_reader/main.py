@@ -34,7 +34,7 @@ def main():
     """
     data = request.get_json()
     
-    print("Received data:", data)  # Debugging :)
+    #print("Received data:", data)  # Debugging :)
     
     
     if data["type"] == "start":
