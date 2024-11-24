@@ -5,30 +5,35 @@ app = Flask(__name__)
 CORS(app)
 
 
-def send_start(data):
-    """
-    sends the start, end and blocked nodes to the UI in a JSON file
-    """
-    # Quick and messy handling 
-    map = Map("complex_graph.json", data["type"], data["difficulty"])
-    neighbours = map.get_neighbours_and_roads(map.current_pos)
-    neighbours_str_keys = {str(k): v for k, v in neighbours.items()}
-    
-    return jsonify({"start" : map.start, 
-                    "end" : map.end, 
-                    "blocked nodes": map.blocked_roads, 
-                    "neighbours": neighbours_str_keys, #self.map.get_neighbours_and_roads(self.map.current_pos), 
-                    "optimal path" :  map.optimal_path, 
-                    "optimal distance" : map.optimal_distance})
+class SendData:
+    def __init__(self, data):
+        
+        self.map = Map("complex_graph.json", data["difficulty"])
+        #self.round = 0
 
-def send_neighbours(data):
-    """
-    calls generate neighbours and sends to the UI a JSON file with them
-    """
-    map = Map("complex_graph.json", data["type"])
-    neighbours = map.get_neighbours_and_roads(data["current"])
-    neighbours_str_keys = {str(k): v for k, v in neighbours.items()}
-    return jsonify({{"neighbours": neighbours_str_keys}})
+    def send_start(self):
+        """
+        sends the start, end and blocked nodes to the UI in a JSON file
+        Keep tracks of the round to reset start and end when needed
+        """
+
+        #if self.round > 1:
+        #    self.map.new_round()
+        #self.round += 1
+
+        return jsonify({"start" : self.map.start, 
+                        "end" : self.map.end, 
+                        "blocked nodes": self.map.blocked_roads, 
+                        "neighbours": self.map.get_neighbours_and_roads(self.map.current_pos), 
+                        "optimal path" :  self.map.optimal_path, 
+                        "optimal distance" : self.map.optimal_distance})
+
+    def send_neighbours(self, data):
+        """
+        calls generate neighbours and sends to the UI a JSON file with them
+        """
+        self.map.process_inputs(data["current"])
+        return jsonify({"neighbours": self.map.get_neighbours_and_roads(self.map.current_pos)})
 
 
 @app.route('/main', methods=['POST'])
@@ -40,11 +45,13 @@ def main():
     
     print("Received data:", data)  # Debugging :)
     
+    send_data = SendData(data)
+    
     if data["type"] == "start":
         # initialize the map object and return the starting information for the frontend
-        return send_start(data)
+        return send_data.send_start()
     elif data["type"] == "neighbours":
-        return send_neighbours(data)
+        return send_data.send_neighbours(data)
  
     
     return jsonify({"error" : "The data is not a JSON or the format is invalid"}), 400
@@ -53,8 +60,8 @@ def main():
 if __name__ == "__main__":
     app.run(debug=True)
 
-# testing if some functions work properly
-# Graph = gr.GeoGraph("map_complex.geojson")
-# print(Graph.G.nodes)
-# Map = Map.Map(Graph)
-# print(Map.generate_start_end(1000))
+#testing if some functions work properly
+#Graph = gr.GeoGraph("map_complex.geojson")
+#print(Graph.G.nodes)
+#Map = Map.Map(Graph)
+#print(Map.generate_start_end(1000))
