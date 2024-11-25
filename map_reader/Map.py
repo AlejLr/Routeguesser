@@ -277,13 +277,37 @@ class Map:
         plt.show()
 
 
-# some testing code, uncomment to visualize a path on a graph with random start and end
-# print("TESTING")
-# map = Map("complex_graph.json", "start", 50)
-# current = list(map.Graph.nodes)[0]
-# start, end = map.start, map.end
-# print(f"START: {start}, END: {end}")
-# optimal_path = map.optimal_path
-# print(f"OPTIMAL PATH: {optimal_path}")
-# print(f"OPTIMAL PATH DISTANCE: {map.optimal_distance}")
-# map.__visualize__()
+# # TESTING
+# import itertools
+# def visualize_connected_components(graph):
+#     colors = itertools.cycle(['red', 'green', 'violet', 'orange', 'yellow'])
+#     pos = {node: node for node in graph.nodes()}  # Use node coordinates as positions
+
+#     plt.figure(figsize=(10, 10))
+#     for component in nx.connected_components(graph):
+#         color = next(colors)
+#         subgraph = graph.subgraph(component)
+#         nx.draw(subgraph, pos, edge_color=color, node_color=color, with_labels=False, node_size=10)
+
+#     plt.show()
+
+# def _create_graph(graph_file):
+#     # NetworkX fills in the nodes
+#     # ROADS are lists of lists, but this can be changed in the future
+
+#     data = json.load(open(graph_file))
+
+#     #Tuples are not native json data types
+#     for node in data["nodes"]:
+#         node["id"] = tuple(node["id"])
+#     for adj_list in data["adjacency"]:
+#         for edge in adj_list:
+#             edge["id"] = tuple(edge["id"])
+
+#     graph = adjacency_graph(data, directed=False, multigraph=False, attrs={'id': 'id', 'key': 'key'})
+
+#     return graph
+
+
+# graph = _create_graph("complex_graph.json")
+# visualize_connected_components(graph)

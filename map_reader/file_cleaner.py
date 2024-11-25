@@ -35,6 +35,7 @@ def file_cleaner(in_file_name, out_file_name):
 
     all_connected_components = sorted(nx.connected_components(raw_graph), key=len, reverse=True)
     graph = raw_graph.subgraph(all_connected_components[0])
+    # graph = raw_graph
 
     new_json = adjacency_data(graph, attrs={'id': 'id', 'key': 'key'})
 
