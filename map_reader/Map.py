@@ -191,6 +191,15 @@ class Map:
             current = self.__history__[current][0]
 
         path = path[::-1]
+
+        complete_road = []
+        previous = path[0]
+        for node in path[1:]:
+            complete_road.extend(self.Graph[node][previous]["road"])
+        path = list(dict.fromkeys(complete_road))
+            #     previous = node
+
+
         # complete_road = [list(path[0])]
         # previous = path[0]
         # for node in path[1:]:
@@ -199,7 +208,7 @@ class Map:
 
         # the path is reversed at first, so we need to undo this operation
         return path, path_distance
-    
+
     # def get_edges_for_path(self, path):
 
     #     new_path = [path[0]]
@@ -210,7 +219,7 @@ class Map:
     #             temp.pop(0)
     #             new_path.extend(temp)
     #         previous = node
-        
+
     #     return new_path
 
     def get_neighbours_and_roads(self, node):
