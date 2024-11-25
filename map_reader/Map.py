@@ -24,7 +24,7 @@ class Map:
         self.Graph = self._create_graph(graph_file)
         if dtype == "start":
             self.number_of_blocked_roads = difficulty
-            #self.blocked_roads = self.generate_blocked_roads(self.number_of_blocked_roads)
+            self.blocked_roads = self.generate_blocked_roads(self.number_of_blocked_roads)
             
             self.score = 0
 
