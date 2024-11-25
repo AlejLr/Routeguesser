@@ -24,7 +24,7 @@ class Map:
         self.Graph = self._create_graph(graph_file)
         if dtype == "start":
             self.number_of_blocked_roads = difficulty
-            self.blocked_roads = self.generate_blocked_roads(self.number_of_blocked_roads)
+            #self.blocked_roads = self.generate_blocked_roads(self.number_of_blocked_roads)
             
             self.score = 0
 
@@ -196,7 +196,11 @@ class Map:
         previous = path[0]
         for node in path[1:]:
             complete_road.extend(self.Graph[node][previous]["road"])
-        path = list(dict.fromkeys(complete_road))
+            previous = node
+
+        complete_road = [tuple(x) for x in complete_road]
+        complete_road = list(dict.fromkeys(complete_road))
+        complete_road = [list(x) for x in complete_road]
             #     previous = node
 
 
@@ -207,7 +211,7 @@ class Map:
         #     previous = node
 
         # the path is reversed at first, so we need to undo this operation
-        return path, path_distance
+        return complete_road, path_distance
 
     # def get_edges_for_path(self, path):
 
@@ -291,32 +295,36 @@ class Map:
 # def visualize_connected_components(graph):
 #     colors = itertools.cycle(['red', 'green', 'violet', 'orange', 'yellow'])
 #     pos = {node: node for node in graph.nodes()}  # Use node coordinates as positions
-
+#
 #     plt.figure(figsize=(10, 10))
 #     for component in nx.connected_components(graph):
 #         color = next(colors)
 #         subgraph = graph.subgraph(component)
 #         nx.draw(subgraph, pos, edge_color=color, node_color=color, with_labels=False, node_size=10)
-
+#
 #     plt.show()
-
+#
+#
+#
 # def _create_graph(graph_file):
 #     # NetworkX fills in the nodes
 #     # ROADS are lists of lists, but this can be changed in the future
-
+#
 #     data = json.load(open(graph_file))
-
+#
 #     #Tuples are not native json data types
 #     for node in data["nodes"]:
 #         node["id"] = tuple(node["id"])
 #     for adj_list in data["adjacency"]:
 #         for edge in adj_list:
 #             edge["id"] = tuple(edge["id"])
-
+#
 #     graph = adjacency_graph(data, directed=False, multigraph=False, attrs={'id': 'id', 'key': 'key'})
-
+#
 #     return graph
-
-
+#
+#
 # graph = _create_graph("complex_graph.json")
 # visualize_connected_components(graph)
+
+#map = Map("complex_graph.json", "start")
