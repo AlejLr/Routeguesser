@@ -159,6 +159,42 @@ input[type="number"]{
     width: 25%;
 }
 
+/* Progress Bar Container */
+#progressBarContainer {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    text-align: center;
+    z-index: 999;
+    display: none;
+}
+
+#progressBar {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 20px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#progressFill {
+    height: 100%;
+    background-color: #4caf50;
+    width: 0;
+    border-radius: 8px 0 0 8px;
+    transition: width 1s ease-in-out;
+}
+
+/* Progress Text */
+#progressText {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
 
 /* Always on the end for not showing before the Game explanation */
 /*
