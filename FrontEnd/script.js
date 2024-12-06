@@ -102,7 +102,7 @@ let distance = 0;
 let difficulty = 50;
 let routesNum = 3;
 
-let blockedNodes;
+let blockedRoads;
 let neighbours;
 let optimalDistance;
 let optimalPath;
@@ -116,7 +116,6 @@ const hardButton = document.querySelector('#hard');
 const menu = document.querySelector('#menu');
 const routeNumber = document.querySelector('#routeNumber');
 const resetButton = document.querySelector('#reset');
-const rebootButton = document.querySelector('#reboot');
 const endRoundButton = document.querySelector('#endRound');
 const distanceReset = document.querySelector('#distanceReset');
 
@@ -126,7 +125,6 @@ easyButton.onclick = setDifficultyEasy;
 mediumButton.onclick = setDifficultyMedium;
 hardButton.onclick = setDifficultyHard;
 resetButton.onclick = resetGame;
-rebootButton.onclick = startNewRound;
 endRoundButton.onclick = endRound;
 startGame.onclick = hideStartScreen;
 
@@ -137,7 +135,7 @@ routeNumber.addEventListener('input', updateRoutesNum);
 
 function loadData(data){
 
-    blockedNodes = data["blocked nodes"];
+    blockedRoads = data["blocked nodes"];
     neighbours = data["neighbours"];
     optimalDistance = data["optimal distance"];
     optimalPath = data["optimal path"];
@@ -145,7 +143,7 @@ function loadData(data){
     start = data["start"];
 
     console.log("Data loaded");
-    console.log("Blocked nodes:", blockedNodes);
+    console.log("Blocked nodes:", blockedRoads);
     console.log("Neighbours:", neighbours);
     console.log("Optimal distance:", optimalDistance);
     console.log("Optimal path:", optimalPath);
@@ -208,7 +206,7 @@ async function startGame(){
         console.log(data);
         console.log("Data received");
         loadData(data);
-        startNewRound();
+        startNewRound(true);
         test();
     }
     catch(error){
@@ -239,10 +237,12 @@ function resetGame() {
 
     distance = 0;
     scoreText.innerHTML = distance;
-    menu.style.display = "block";
+    // menu.style.display = "block";
 
-    path = [startMarker.getLatLng()]
-    polyline.setLatLngs(path);
+    // path = [startMarker.getLatLng()]
+    // polyline.setLatLngs(path);
+    startNewRound();
+
 
 }
 
