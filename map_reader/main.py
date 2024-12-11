@@ -11,7 +11,7 @@ def send_start(data):
     sends the start, end and blocked nodes to the UI in a JSON file
     Keep tracks of the round to reset start and end when needed
     """
-    map = Map("complex_graph.json", data["type"], data["difficulty"])
+    map.game_init(data["difficulty"])
     return jsonify({"start" : map.start, 
                     "end" : map.end, 
                     "blocked nodes": map.blocked_roads, 
@@ -23,7 +23,6 @@ def send_neighbours(data):
     """
     calls generate neighbours and sends to the UI a JSON file with them
     """
-    map = Map("complex_graph.json", data["type"])
     return jsonify({"neighbours": map.get_neighbours_and_roads(data["current"])})
 
 
@@ -48,6 +47,7 @@ def main():
 
 
 if __name__ == "__main__":
+    map = Map("complex_graph.json")
     app.run(debug=True)
 
 #testing if some functions work properly

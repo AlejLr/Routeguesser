@@ -6,6 +6,7 @@ from decimal import Decimal, getcontext
 from queue import PriorityQueue
 
 from networkx import adjacency_graph
+from random import randint
 
 
 class Map:
@@ -17,21 +18,27 @@ class Map:
     (CONSIDER) The greater Map will be composed by multiple smaller Maps so that we can work in chunks based on zoom in.
     """
 
-    def __init__(self, graph_file, dtype, difficulty=50):
+    def __init__(self, graph_file):
         """
         also generates the blocked nodes
         """
+        print('Initialized')
+        self.serial = random.randint(0,200)
+
         self.Graph = self._create_graph(graph_file)
-        if dtype == "start":
-            self.number_of_blocked_roads = difficulty
-            self.blocked_roads = self.generate_blocked_roads(self.number_of_blocked_roads)
-            
-            self.score = 0
 
-            self.start, self.end = self.generate_start_end()
-            self.current_pos = self.start
 
-            self.optimal_path, self.optimal_distance = self.astar()
+    def game_init(self, dtype, difficulty=50):
+        print(self.serial)
+
+        self.number_of_blocked_roads = difficulty
+        self.blocked_roads = self.generate_blocked_roads(self.number_of_blocked_roads)
+        self.score = 0
+
+        self.start, self.end = self.generate_start_end()
+        self.current_pos = self.start
+
+        self.optimal_path, self.optimal_distance = self.astar()
     
     def new_round(self):
         self.start = self.end
@@ -238,6 +245,8 @@ class Map:
 
         rtype: dict(G.node, tuple(list(Graph.node), float))
         """
+
+        print(self.serial)
 
         # if node is None:
         #     node = self.current_pos
