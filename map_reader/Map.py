@@ -22,7 +22,6 @@ class Map:
         """
         also generates the blocked nodes
         """
-        print('Initialized')
         self.serial = random.randint(0,200)
 
         self.Graph = self._create_graph(graph_file)
