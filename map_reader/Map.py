@@ -153,7 +153,7 @@ class Map:
         self.__history__ = {start: (None, 0)}
         self.astar_solver(priority_queue, end, False)
         # return self.get_optimal_path_and_distance(end)
-        return self._debug_get_optimal_path_and_distance(end)
+        return self.get_optimal_path_and_distance(end)
 
 
     def astar_solver(self, priority_queue, end, exclude_blocked=True):
@@ -199,17 +199,17 @@ class Map:
 
         path = path[::-1]
 
-        complete_road = []
+        complete_road = [path[0]]
         previous = path[0]
         for node in path[1:]:
-            edge = self.Graph[previous][node]["road"]
-            if edge[0] != previous:
+            edge = self.Graph[node][previous]["road"]
+            if len(edge) > 1 and Map.calculate_cartesian_distance(previous, edge[-1]) < Map.calculate_cartesian_distance(previous, edge[0]):
                 edge = edge[::-1]
-            complete_road.extend(edge)
+            complete_road.extend(edge + [node])
             previous = node
 
-        # complete_road = [tuple(x) for x in complete_road]
-        # complete_road = list(dict.fromkeys(complete_road))
+        complete_road = [tuple(x) for x in complete_road]
+        complete_road = list(dict.fromkeys(complete_road))
         complete_road = [list(x) for x in complete_road]
             #     previous = node
 
@@ -242,13 +242,13 @@ class Map:
         previous = path[0]
         for node in path[1:4]:
             edge = self.Graph[previous][node]["road"]
-            if edge[0] != previous:
-                edge = edge[::-1]
+            # if edge[0] != previous:
+            #     edge = edge[::-1]
             complete_road.extend(edge)
             previous = node
 
-        # complete_road = [tuple(x) for x in complete_road]
-        # complete_road = list(dict.fromkeys(complete_road))
+        complete_road = [tuple(x) for x in complete_road]
+        complete_road = list(dict.fromkeys(complete_road))
         complete_road = [list(x) for x in complete_road]
             #     previous = node
 
