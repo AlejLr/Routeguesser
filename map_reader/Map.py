@@ -152,7 +152,8 @@ class Map:
         priority_queue.put((0, start, 0))
         self.__history__ = {start: (None, 0)}
         self.astar_solver(priority_queue, end, False)
-        return self.get_optimal_path_and_distance(end)
+        # return self.get_optimal_path_and_distance(end)
+        return self._debug_get_optimal_path_and_distance(end)
 
 
     def astar_solver(self, priority_queue, end, exclude_blocked=True):
@@ -201,7 +202,7 @@ class Map:
         complete_road = []
         previous = path[0]
         for node in path[1:]:
-            edge = self.Graph[node][previous]["road"]
+            edge = self.Graph[previous][node]["road"]
             if edge[0] != previous:
                 edge = edge[::-1]
             complete_road.extend(edge)
@@ -221,6 +222,46 @@ class Map:
 
         # the path is reversed at first, so we need to undo this operation
         return complete_road, path_distance
+    
+    def _debug_get_optimal_path_and_distance(self, end):
+        """
+        returns the optimal path from the start to the end, using self.__history__
+        rtype: list(Graph.node)
+        """
+        # TODO
+        path = []
+        current = end
+        path_distance = self.__history__[end][1]
+        while current is not None:
+            path.append(current)
+            current = self.__history__[current][0]
+
+        path = path[::-1]
+
+        complete_road = []
+        previous = path[0]
+        for node in path[1:4]:
+            edge = self.Graph[previous][node]["road"]
+            if edge[0] != previous:
+                edge = edge[::-1]
+            complete_road.extend(edge)
+            previous = node
+
+        # complete_road = [tuple(x) for x in complete_road]
+        # complete_road = list(dict.fromkeys(complete_road))
+        complete_road = [list(x) for x in complete_road]
+            #     previous = node
+
+
+        # complete_road = [list(path[0])]
+        # previous = path[0]
+        # for node in path[1:]:
+        #     complete_road.extend(self.Graph[previous][node]["road"][1:])
+        #     previous = node
+
+        # the path is reversed at first, so we need to undo this operation
+        return complete_road, path_distance
+
 
     # def get_edges_for_path(self, path):
 
