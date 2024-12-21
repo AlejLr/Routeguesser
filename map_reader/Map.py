@@ -201,11 +201,14 @@ class Map:
         complete_road = []
         previous = path[0]
         for node in path[1:]:
-            complete_road.extend(self.Graph[node][previous]["road"])
+            edge = self.Graph[node][previous]["road"]
+            if edge[0] != previous:
+                edge = edge[::-1]
+            complete_road.extend(edge)
             previous = node
 
-        complete_road = [tuple(x) for x in complete_road]
-        complete_road = list(dict.fromkeys(complete_road))
+        # complete_road = [tuple(x) for x in complete_road]
+        # complete_road = list(dict.fromkeys(complete_road))
         complete_road = [list(x) for x in complete_road]
             #     previous = node
 
@@ -334,5 +337,3 @@ class Map:
 #
 # graph = _create_graph("complex_graph.json")
 # visualize_connected_components(graph)
-
-#map = Map("complex_graph.json", "start")
