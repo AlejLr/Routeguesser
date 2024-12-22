@@ -71,8 +71,12 @@ def file_cleaner(in_file_name, out_file_name):
     for n in range(2):
         joiner(main_graph)
 
+    all_connected_components = sorted(nx.connected_components(main_graph), key=len, reverse=True)
+    frozen_graph = main_graph.subgraph(all_connected_components[0])
+    final_graph = nx.Graph(frozen_graph)
 
-    new_json = adjacency_data(main_graph, attrs={'id': 'id', 'key': 'key'})
+
+    new_json = adjacency_data(final_graph, attrs={'id': 'id', 'key': 'key'})
 
     with open(out_file_name, "w") as outfile:
         json.dump(new_json, outfile)
@@ -251,4 +255,3 @@ def _create_graph(graph_file):
 file_cleaner("map_complete.geojson", "complex_graph2.json")
 graph = _create_graph("complex_graph2.json")
 visualize_degrees(graph)
-# file_cleaner("map_complete.geojson", "complex_graph2.json")
