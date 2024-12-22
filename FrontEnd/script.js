@@ -118,6 +118,8 @@ const routeNumber = document.querySelector('#routeNumber');
 const resetButton = document.querySelector('#reset');
 const endRoundButton = document.querySelector('#endRound');
 const distanceReset = document.querySelector('#distanceReset');
+const roundEndMenu = document.querySelector('#roundEndMenu');
+const nextRoundButton = document.querySelector('#nextRoundButton');
 
 
 
@@ -126,6 +128,7 @@ mediumButton.onclick = setDifficultyMedium;
 hardButton.onclick = setDifficultyHard;
 resetButton.onclick = resetGame;
 endRoundButton.onclick = endRound;
+nextRoundButton.onclick = nextRound;
 startGame.onclick = hideStartScreen;
 
 routeNumber.addEventListener('input', updateRoutesNum);
@@ -207,7 +210,7 @@ async function startGame(){
         console.log("Data received");
         loadData(data);
         startNewRound(true);
-        test();
+        // test();
     }
     catch(error){
         console.error("Error initializing:", error);
@@ -270,4 +273,13 @@ function updateDistance(addition) {
 
 function endRound() {
     console.log("Round ended. Score: ", 100*distance/optimalDistance);
+    roundEndMenu.style.display = "block";
+}
+
+function nextRound() {
+    console.log("Going into next round");
+    // I want this function to load new data with the new starting node as the previous end node and without the
+    // possibility of the new end node being the previous starting node. I don't know how, since I don't know flask
+    loadData(data);
+    startNewRound(false);
 }

@@ -50,6 +50,7 @@ endIcon = L.icon({
 // Shows the new optimal path (it shows it from the start for now. This is not permanent) and the new blocked roads (called blocked nodes, but they are roads)
 // firsTime simbolises if it's the first time the function is called
 function startNewRound(firstTime=false) {
+    roundEndMenu.display = "none";
     if (!firstTime) clearPreviousRound()
     optimalPathLine = L.polyline(optimalPath, {color: '#78a100'});
     blockedRoadsFeatureGroup = L.featureGroup();
