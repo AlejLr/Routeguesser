@@ -304,5 +304,5 @@ class Map:
 #
 # graph = _create_graph("complex_graph.json")
 # visualize_connected_components(graph)
-map = Map("complex_graph.json")
-map.game_init(50)
+# map = Map("complex_graph.json")
+# map.game_init(50)

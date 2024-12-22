@@ -4,7 +4,9 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-game = Map("complex_graph.json")
+# initialize the map object globally so that it can be used dynamically by the server, 
+# when frontend sends requests with updated player position
+game = Map("complex_graph2.json")
 
 def send_start(data):
     """
@@ -37,7 +39,6 @@ def main():
     
     
     if data["type"] == "start":
-        # initialize the map object and return the starting information for the frontend
         return send_start(data)
     elif data["type"] == "neighbours":
         return send_neighbours(data)
@@ -48,9 +49,3 @@ def main():
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=5000)
-
-#testing if some functions work properly
-#Graph = gr.GeoGraph("map_complex.geojson")
-#print(Graph.G.nodes)
-#Map = Map.Map(Graph)
-#print(Map.generate_start_end(1000))
