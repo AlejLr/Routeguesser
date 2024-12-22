@@ -4,26 +4,26 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-
+game = Map("complex_graph.json")
 
 def send_start(data):
     """
     sends the start, end and blocked nodes to the UI in a JSON file
     Keep tracks of the round to reset start and end when needed
     """
-    map.game_init(data["difficulty"])
-    return jsonify({"start" : map.start, 
-                    "end" : map.end, 
-                    "blocked nodes": map.blocked_roads, 
-                    "neighbours": map.get_neighbours_and_roads(map.current_pos), 
-                    "optimal path" :  map.optimal_path, 
-                    "optimal distance" : map.optimal_distance})
+    game.game_init(data["difficulty"])
+    return jsonify({"start" : game.start, 
+                    "end" : game.end, 
+                    "blocked nodes": game.blocked_roads, 
+                    "neighbours": game.get_neighbours_and_roads(game.current_pos), 
+                    "optimal path" :  game.optimal_path, 
+                    "optimal distance" : game.optimal_distance})
 
 def send_neighbours(data):
     """
     calls generate neighbours and sends to the UI a JSON file with them
     """
-    return jsonify({"neighbours": map.get_neighbours_and_roads(data["current"])})
+    return jsonify({"neighbours": game.get_neighbours_and_roads(data["current"])})
 
 
 @app.route('/main', methods=['POST'])
@@ -47,8 +47,7 @@ def main():
 
 
 if __name__ == "__main__":
-    map = Map("complex_graph.json")
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
 
 #testing if some functions work properly
 #Graph = gr.GeoGraph("map_complex.geojson")

@@ -2,11 +2,9 @@ import json
 import networkx as nx
 import random
 import matplotlib.pyplot as plt
-from decimal import Decimal, getcontext
+from decimal import Decimal
 from queue import PriorityQueue
-
 from networkx import adjacency_graph
-from random import randint
 
 
 class Map:
@@ -73,27 +71,21 @@ class Map:
         rtype: list(tuple(int, int))
         """
         try:
-            # Check validity of input size, Graph object, etc...
-
-            # Create a copy of the Map Graph
             copy_g = nx.Graph(self.Graph)
-
-            # List of the possible edges and list of edges that will be removed from original graph
             possible_edges = list(copy_g.edges())
             removable_edges = []
             removable_roads = []
 
-            # While the goal is not yet reached
+    
             while len(removable_edges) < number_of_blocked_nodes:
-                # Check if there are possibilities left
                 if len(possible_edges) < 1:
                     raise Exception("Cannot remove edges to complete the block roads request.")
 
-                # Choose a random node and remove it from the possibilities
+                # choose a random node and remove it from the possibilities
                 try_remove = random.choice(possible_edges)
                 possible_edges.remove(try_remove)
 
-                # Remove it from the graph copy and check if it remains connected, otherwise add it back to retry
+                # remove it from the graph copy and check if it remains connected, otherwise add it back to retry
                 removable_road = copy_g[try_remove[0]][try_remove[1]]["road"]
                 copy_g.remove_edge(*try_remove)
 
@@ -103,13 +95,12 @@ class Map:
                 else:
                     copy_g.add_edge(*try_remove)
 
-            # Block the edges in the original graph
+            # block the edges in the original graph
             for edge in removable_edges:
                 self.Graph[edge[0]][edge[1]]['blocked'] = True
 
             return removable_roads
 
-        # Add more specific exceptions
         except Exception as e:
             raise e
 
@@ -208,34 +199,9 @@ class Map:
             complete_road.extend(edge + [node])
             previous = node
 
-        # complete_road = [tuple(x) for x in complete_road]
-        # complete_road = list(dict.fromkeys(complete_road))
         complete_road = [list(x) for x in complete_road]
-            #     previous = node
-
-
-        # complete_road = [list(path[0])]
-        # previous = path[0]
-        # for node in path[1:]:
-        #     complete_road.extend(self.Graph[previous][node]["road"][1:])
-        #     previous = node
-
-        # the path is reversed at first, so we need to undo this operation
         return complete_road, path_distance
     
-
-    # def get_edges_for_path(self, path):
-
-    #     new_path = [path[0]]
-    #     previous = path[0]
-    #     for node in path:
-    #         if node != previous:
-    #             temp = self.Graph[node][previous]["road"]
-    #             temp.pop(0)
-    #             new_path.extend(temp)
-    #         previous = node
-
-    #     return new_path
 
     def get_neighbours_and_roads(self, node):
         """Generates a dictionary of neighbouring nodes for each node in the graph.
@@ -245,7 +211,6 @@ class Map:
         This is the function to return to the frontend
         
         
-        TODO: it should also return the length of the road to the neighbour, not just the road
 
         rtype: dict(G.node, tuple(list(Graph.node), float))
         """
@@ -339,3 +304,5 @@ class Map:
 #
 # graph = _create_graph("complex_graph.json")
 # visualize_connected_components(graph)
+map = Map("complex_graph.json")
+map.game_init(50)

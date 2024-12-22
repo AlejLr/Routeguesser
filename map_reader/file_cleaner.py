@@ -18,9 +18,8 @@ an adjacency list accepted by networkx"""
 
 
 """
-
-import geojson
 import json
+import geojson
 import networkx as nx
 from networkx import adjacency_data
 from networkx import adjacency_graph
@@ -249,7 +248,7 @@ def _create_graph(graph_file):
 
     return graph
 
-file_cleaner("residential_area.geojson", "complex_graph.json")
-graph = _create_graph("complex_graph.json")
+file_cleaner("map_complete.geojson", "complex_graph2.json")
+graph = _create_graph("complex_graph2.json")
 visualize_degrees(graph)
-#file_cleaner("map_complete.geojson", "complex_graph.json")
+# file_cleaner("map_complete.geojson", "complex_graph2.json")
