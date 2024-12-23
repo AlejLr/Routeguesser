@@ -154,16 +154,18 @@ class Map:
         We use this to judge which node is best to visit next
 
         This function modifies self.__history__ as a side effect
-        """ 
-
+        """
         while priority_queue:
             # sort the queue based on the smallest prospective distance to the end
             _, current, distance = priority_queue.get()
+
             if current == end:
                 break
+
             for neighbour in self.Graph[current]:
                 # add the neighbour if it is not blocked,
-                candidate_distance = self.__history__[current][1] + self.calculate_cartesian_distance(current, neighbour)* Decimal(10000)
+                edge = self.Graph[current][neighbour]["road"]
+                candidate_distance = self.__history__[current][1] + Decimal(self.Graph[current][neighbour]["dist"]) * Decimal(10000)
                 previous_distance = self.__history__[neighbour][1] if neighbour in self.__history__ else Decimal("inf")
                 if (candidate_distance < previous_distance or neighbour not in self.__history__) and (not self.Graph[current][neighbour]["blocked"] or exclude_blocked):
                     new_distance = candidate_distance
@@ -171,9 +173,11 @@ class Map:
                     heuristic = self.calculate_cartesian_distance(neighbour, end) * Decimal(10000)
                     self.__history__[neighbour] = (current, new_distance)
                     priority_queue.put((new_distance + heuristic, neighbour, new_distance))
+                    # print(f"new distance {new_distance} to {neighbour} from {current}")
+                    # print(f"heuristic {heuristic} to {neighbour} from {end}")
                     
-
-            
+        if current != end:
+            raise Exception("No path found for the astar algorithm")
 
     def get_optimal_path_and_distance(self, end):
         """
@@ -223,8 +227,10 @@ class Map:
         neighbour_and_roads = []
         node = tuple(node)
         for neighbour in list(self.Graph.neighbors(node)):
-            # if (self.Graph[node][neighbour]["blocked"] is False) or (exclude_blocked is False):
-            neighbour_and_roads.append([neighbour, self.Graph[node][neighbour]["road"], float(Decimal(self.Graph[node][neighbour]["dist"]) * Decimal(10000))])
+            edge = self.Graph[neighbour][node]["road"]
+            if len(edge) > 1 and Map.calculate_cartesian_distance(node, edge[-1]) < Map.calculate_cartesian_distance(node, edge[0]):
+                edge = edge[::-1]
+            neighbour_and_roads.append([neighbour, edge + [neighbour], float(Decimal(self.Graph[node][neighbour]["dist"]) * Decimal(10000))])
         #print("Roads:", neighbour_and_roads)
         return neighbour_and_roads
 
@@ -306,3 +312,4 @@ class Map:
 # visualize_connected_components(graph)
 # map = Map("complex_graph.json")
 # map.game_init(50)
+# print(map.optimal_path)
