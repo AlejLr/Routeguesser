@@ -101,6 +101,7 @@ function runAnimations() {
 let distance = 0;
 let difficulty = 50;
 let routesNum = 3;
+let currentRound = 0;
 
 let blockedRoads;
 let neighbours;
@@ -118,6 +119,7 @@ const routeNumber = document.querySelector('#routeNumber');
 const resetButton = document.querySelector('#reset');
 const distanceReset = document.querySelector('#distanceReset');
 const progressBarContainer = document.querySelector('#progressBarContainer');
+const nextRoundButton = document.querySelector('#nextRoundButton');
 
 
 
@@ -125,7 +127,7 @@ easyButton.onclick = setDifficultyEasy;
 mediumButton.onclick = setDifficultyMedium;
 hardButton.onclick = setDifficultyHard;
 resetButton.onclick = resetGame;
-nextRoundButton.onclick = nextRound; // This button is not defined yet
+nextRoundButton.onclick = nextRound;
 startGame.onclick = hideStartScreen;
 
 routeNumber.addEventListener('input', updateRoutesNum);
@@ -272,6 +274,9 @@ function updateDistance(addition) {
 function endRound() {
     console.log("Round ended. Score: ", optimalDistance, "/", distance, "=", 100*optimalDistance/distance);
     progressBarContainer.style.display = "block";
+    if(distance < optimalDistance){
+        showProgressBar(100);
+    }
     showProgressBar(Math.round(100*(optimalDistance/distance)));
 }
 
@@ -300,15 +305,22 @@ function showProgressBar(percentage) {
     progressText.textContent = `Score: ${percentage}%`;
 }
 
-function hideProgressBar() {
-    const progressBarContainer = document.getElementById("progressBarContainer");
-    progressBarContainer.style.display = "none";
-}
-
 function nextRound() {
     console.log("Going into next round");
-    // I want this function to load new data with the new starting node as the previous end node and without the
-    // possibility of the new end node being the previous starting node. I don't know how, since I don't know flask
-    loadData(data);
-    startNewRound(false);
+    // I cannot add the start from the end point since the functionality doesnt exist on the backend
+    currentRound++;
+    if (currentRound === routesNum) {
+        console.log("Game finished");
+        finishGame();
+    }
+    else{
+        startGame()
+        loadData(data);
+        progressBarContainer.style.display = "none";
+        startNewRound(true);
+    }
+}
+
+function finishGame() {
+    // A page will appear saying the game is finished and will have a button to reload the page to start again
 }
