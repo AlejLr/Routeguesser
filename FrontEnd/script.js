@@ -118,8 +118,7 @@ const routeNumber = document.querySelector('#routeNumber');
 const resetButton = document.querySelector('#reset');
 const endRoundButton = document.querySelector('#endRound');
 const distanceReset = document.querySelector('#distanceReset');
-const roundEndMenu = document.querySelector('#roundEndMenu');
-const nextRoundButton = document.querySelector('#nextRoundButton');
+const progressBarContainer = document.querySelector('#progressBarContainer');
 
 
 
@@ -128,7 +127,7 @@ mediumButton.onclick = setDifficultyMedium;
 hardButton.onclick = setDifficultyHard;
 resetButton.onclick = resetGame;
 endRoundButton.onclick = endRound;
-nextRoundButton.onclick = nextRound;
+nextRoundButton.onclick = nextRound; // This button is not defined yet
 startGame.onclick = hideStartScreen;
 
 routeNumber.addEventListener('input', updateRoutesNum);
@@ -244,6 +243,7 @@ function resetGame() {
 
     // path = [startMarker.getLatLng()]
     // polyline.setLatLngs(path);
+    progressBarContainer.style.display = "none";
     startNewRound();
 
 
@@ -273,7 +273,38 @@ function updateDistance(addition) {
 
 function endRound() {
     console.log("Round ended. Score: ", 100*distance/optimalDistance);
-    roundEndMenu.style.display = "block";
+    progressBarContainer.style.display = "block";
+    showProgressBar(Math.round(100*(optimalDistance/distance)));
+}
+
+function showProgressBar(percentage) {
+    const progressBarContainer = document.getElementById("progressBarContainer");
+    const progressFill = document.getElementById("progressFill");
+    const progressText = document.getElementById("progressText");
+
+    progressBarContainer.style.display = "block";
+
+    progressFill.style.width = "0";
+    progressFill.style.backgroundColor = "red";
+
+    setTimeout(() => {
+        progressFill.style.width = `${percentage}%`;
+
+        if (percentage < 33) {
+            progressFill.style.backgroundColor = "red";
+        } else if (percentage < 66) {
+            progressFill.style.backgroundColor = "yellow";
+        } else {
+            progressFill.style.backgroundColor = "green";
+        }
+    }, 100);
+
+    progressText.textContent = `Score: ${percentage}%`;
+}
+
+function hideProgressBar() {
+    const progressBarContainer = document.getElementById("progressBarContainer");
+    progressBarContainer.style.display = "none";
 }
 
 function nextRound() {

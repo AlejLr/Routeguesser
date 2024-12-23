@@ -97,24 +97,6 @@ body {
     gap: 10px;*/
 }
 
-#roundEndMenu {
-    position:absolute;
-    display: none;
-    text-align: center;
-    top: 90%;
-    right: 50%;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.9);
-    border: 2px solid #cccccc;
-    padding: 10px;
-    border-radius: 8px;
-    font-size: 14px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    /*display: flex;
-    gap: 10px;*/
-}
-
 #reset {
     padding: 5px 10px;
 }
@@ -179,14 +161,19 @@ input[type="number"]{
 
 /* Progress Bar Container */
 #progressBarContainer {
-    position: absolute;
-    top: 20px;
+    position: fixed;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     width: 80%;
     text-align: center;
-    z-index: 999;
+    z-index: 1000;
     display: none;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #000000e2;
+    border-radius: 8px;
+    padding: 20px;
+    border-radius: 8px;
 }
 
 #progressBar {
@@ -196,15 +183,16 @@ input[type="number"]{
     overflow: hidden;
     height: 20px;
     margin-bottom: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 2px solid #000000e2;
+    border-radius: 8px;
 }
 
 #progressFill {
     height: 100%;
-    background-color: #4caf50;
+    background-color: red;
     width: 0;
     border-radius: 8px 0 0 8px;
-    transition: width 1s ease-in-out;
+    transition: width 1s ease-in-out, background-color 0.1s ease-in-out;
 }
 
 /* Progress Text */

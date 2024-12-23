@@ -141,11 +141,3 @@ function showNeighbours() {
 
     }
 }
-
-// Alex testing spot
-
-function test(){
-    optimalPathLine = L.polyline(optimalPath, {color: '#78a100'}).addTo(map);
-    console.log("Optimal path: ", optimalPath);
-    console.log("Optimal path created");
-}
