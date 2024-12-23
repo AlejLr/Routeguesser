@@ -19,7 +19,7 @@ def send_start(data):
                     "blocked nodes": game.blocked_roads, 
                     "neighbours": game.get_neighbours_and_roads(game.current_pos), 
                     "optimal path" :  game.optimal_path, 
-                    "optimal distance" : game.optimal_distance})
+                    "optimal distance" : float(game.optimal_distance)})
 
 def send_neighbours(data):
     """
