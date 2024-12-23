@@ -268,13 +268,21 @@ function hideStartScreen() {
 function updateDistance(addition) {
     console.log(addition, typeof(addition))
     distance += parseFloat(addition);
-    scoreText.innerHTML = distance;
+    scoreText.innerHTML = Math.round(distance);
 }
 
 function endRound() {
-    console.log("Round ended. Score: ", 100*distance/optimalDistance);
+
     progressBarContainer.style.display = "block";
-    showProgressBar(Math.round(100*(optimalDistance/distance)));
+
+    if (optimalDistance === 0) {
+        showProgressBar(0);
+    }
+    const score = (1 - ((distance - optimalDistance) / optimalDistance)) * 100;
+    console.log("Score:", score);
+    console.log(distance);
+    console.log(optimalDistance);
+    showProgressBar(score);
 }
 
 function showProgressBar(percentage) {
@@ -299,7 +307,7 @@ function showProgressBar(percentage) {
         }
     }, 100);
 
-    progressText.textContent = `Score: ${percentage}%`;
+    progressText.textContent = `Score: ${Math.round(percentage)}%`;
 }
 
 function hideProgressBar() {
