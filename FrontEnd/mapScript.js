@@ -25,9 +25,9 @@ attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreet
 //Create circleIcon
 circleIcon = L.icon({
     iconUrl: 'circle_icon.png',
-    iconSize: [16, 16],
-    iconAnchor: [8, 8],
-    popupAnchor: [8, 8]
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+    popupAnchor: [10, 10]
 });
 
 //Create startIcon
@@ -50,9 +50,9 @@ endIcon = L.icon({
 // Shows the new optimal path (it shows it from the start for now. This is not permanent) and the new blocked roads (called blocked nodes, but they are roads)
 // firsTime simbolises if it's the first time the function is called
 function startNewRound(firstTime=false) {
-    roundEndMenu.display = "none";
     if (!firstTime) clearPreviousRound()
     optimalPathLine = L.polyline(optimalPath, {color: '#78a100'});
+    optimalPathLine.addTo(map);
     blockedRoadsFeatureGroup = L.featureGroup();
     // blockedEdges is an array with the start and end points of the blocked roads
     blockedEdges = [];
@@ -72,7 +72,7 @@ function startNewRound(firstTime=false) {
     pathLine = L.polyline(detailedPath, {color: '#2e80d1'}).addTo(map);
     currentPosition = start;
     showNeighbours(path, detailedPath);
-    console.log(startMarker.getLatLng(), endMarker.getLatLng());
+    // console.log(startMarker.getLatLng(), endMarker.getLatLng());
     map.fitBounds([startMarker.getLatLng(), endMarker.getLatLng()], {padding: [0.4, 0.4]});
 }
 
@@ -91,17 +91,15 @@ function showNeighbours() {
     neighbourMarkers.forEach(function(marker) {marker.remove()});
     neighbourMarkers = [];
     let neighbourSubpaths = [];
-    console.log("blockedEdges",blockedEdges)
+    // console.log("blockedEdges",blockedEdges)
     for (trio of neighbours) {
         let endPoint = trio[0],
         subpath = trio[1],
         distance = trio[2];
-        console.log("edge:",[currentPosition, endPoint]);
+        // console.log("edge:",[currentPosition, endPoint]);
 
         let edgeBlocked = false
         for (blockedEdge of blockedEdges) {
-            // console.log(blockedEdge, (blockedEdge == [currentPosition, endPoint] || blockedEdge == [endPoint, currentPosition]))
-            // 🤮🤮🤮🤮🤮 I'm sorry for this warcrime
             if ((blockedEdge[0][0] == currentPosition[0] && blockedEdge[0][1] == currentPosition[1]) && (blockedEdge[1][0] == endPoint[0] && blockedEdge[1][1] == endPoint[1])
                 || (blockedEdge[1][0] == currentPosition[0] && blockedEdge[1][1] == currentPosition[1]) && (blockedEdge[0][0] == endPoint[0] && blockedEdge[0][1] == endPoint[1])) {
                 edgeBlocked = true
@@ -131,6 +129,7 @@ function showNeighbours() {
 
                 if (e.latlng.equals(end)) {
                     optimalPathLine.addTo(map);
+                    neighbourMarkers.forEach(function(marker) {marker.remove()});
                     endRound();
                 }
                 else {

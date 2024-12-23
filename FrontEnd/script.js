@@ -116,7 +116,6 @@ const hardButton = document.querySelector('#hard');
 const menu = document.querySelector('#menu');
 const routeNumber = document.querySelector('#routeNumber');
 const resetButton = document.querySelector('#reset');
-const endRoundButton = document.querySelector('#endRound');
 const distanceReset = document.querySelector('#distanceReset');
 const progressBarContainer = document.querySelector('#progressBarContainer');
 
@@ -126,7 +125,6 @@ easyButton.onclick = setDifficultyEasy;
 mediumButton.onclick = setDifficultyMedium;
 hardButton.onclick = setDifficultyHard;
 resetButton.onclick = resetGame;
-endRoundButton.onclick = endRound;
 nextRoundButton.onclick = nextRound; // This button is not defined yet
 startGame.onclick = hideStartScreen;
 
@@ -268,21 +266,13 @@ function hideStartScreen() {
 function updateDistance(addition) {
     console.log(addition, typeof(addition))
     distance += parseFloat(addition);
-    scoreText.innerHTML = Math.round(distance);
+    scoreText.innerHTML = Math.round(distance).toString();
 }
 
 function endRound() {
-
+    console.log("Round ended. Score: ", optimalDistance, "/", distance, "=", 100*optimalDistance/distance);
     progressBarContainer.style.display = "block";
-
-    if (optimalDistance === 0) {
-        showProgressBar(0);
-    }
-    const score = (1 - ((distance - optimalDistance) / optimalDistance)) * 100;
-    console.log("Score:", score);
-    console.log(distance);
-    console.log(optimalDistance);
-    showProgressBar(score);
+    showProgressBar(Math.round(100*(optimalDistance/distance)));
 }
 
 function showProgressBar(percentage) {
@@ -307,7 +297,7 @@ function showProgressBar(percentage) {
         }
     }, 100);
 
-    progressText.textContent = `Score: ${Math.round(percentage)}%`;
+    progressText.textContent = `Score: ${percentage}%`;
 }
 
 function hideProgressBar() {
