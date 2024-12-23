@@ -1,11 +1,5 @@
 # syntax=docker/dockerfile:1
 
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Dockerfile reference guide at
-# https://docs.docker.com/go/dockerfile-reference/
-
-# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
-
 ARG PYTHON_VERSION=3.11.9
 FROM python:${PYTHON_VERSION}-slim AS base
 
@@ -38,22 +32,15 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     python -m pip install -r requirements.txt
 
-# Copy the backend code
-# COPY map_reader/ /app/map_reader/
 
-# # Copy the frontend code
-# COPY frontend/ /app/frontend/
-
-# # Copy the Python dependencies file
-# COPY requirements.txt /app/
 
 COPY . .
 
-# Set environment variable for Flask
+# set environment variable for Flask
 ENV FLASK_APP=main.py
 
-# Expose the port Flask will run on
+# expose the port Flask will run on
 EXPOSE 5000
 
-# Run the Flask app
+
 CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
