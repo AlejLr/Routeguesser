@@ -1,0 +1,85 @@
+{
+  "directed": false,
+
+  "multigraph": false,
+
+  "graph": [],
+
+  "nodes":
+  [
+    {"id": [0, 0]},
+    {"id": [0, 1]},
+    {"id": [2, 1]},
+    {"id": [2, 4]},
+    {"id": [6, 4]},
+    {"id": [11, 4]},
+    {"id": [17, 4]},
+    {"id": [21, 0]},
+    {"id": [7, 0]},
+    {"id": [14, 0]},
+    {"id": [4, 3]},
+    {"id": [9, 3]},
+    {"id": [14, 3]}
+  ],
+
+  "adjacency":
+  [
+    [
+      {"dist": 1.0, "road": [[0, 0], [0, 1]], "blocked": false, "id": [0, 1]},
+      {"dist": 7.0, "road": [[0, 0], [7, 0]], "blocked": false, "id": [7, 0]},
+      {"dist": 5.0, "road": [[0, 0], [4, 3]], "blocked": false, "id": [4, 3]}
+    ],
+    [
+      {"dist": 1.0, "road": [[0, 0], [0, 1]], "blocked": false, "id": [0, 0]},
+      {"dist": 2.0, "road": [[0, 1], [2, 1]], "blocked": false, "id": [2, 1]}
+    ],
+    [
+      {"dist": 2.0, "road": [[0, 1], [2, 1]], "blocked": false, "id": [0, 1]},
+      {"dist": 3.0, "road": [[2, 1], [2, 4]], "blocked": false, "id": [2, 4]}
+    ],
+    [
+      {"dist": 3.0, "road": [[2, 1], [2, 4]], "blocked": false, "id": [2, 1]},
+      {"dist": 4.0, "road": [[2, 4], [6, 4]], "blocked": false, "id": [6, 4]}
+    ],
+    [
+      {"dist": 4.0, "road": [[2, 4], [6, 4]], "blocked": false, "id": [2, 4]},
+      {"dist": 5.0, "road": [[6, 4], [11, 4]], "blocked": false, "id": [11, 4]}
+    ],
+    [
+      {"dist": 5.0, "road": [[6, 4], [11, 4]], "blocked": false, "id": [6, 4]},
+      {"dist": 6.0, "road": [[11, 4], [17, 4]], "blocked": false, "id": [17, 4]}
+    ],
+    [
+      {"dist": 6.0, "road": [[11, 4], [17, 4]], "blocked": false, "id": [11, 4]},
+      {"dist": 5.656854249492381, "road": [[17, 4], [21, 0]], "blocked": false, "id": [21, 0]}
+    ],
+    [
+      {"dist": 5.656854249492381, "road": [[17, 4], [21, 0]], "blocked": false, "id": [17, 4]},
+      {"dist": 7.0, "road": [[14, 0], [21, 0]], "blocked": false, "id": [14, 0]},
+      {"dist": 7.615773105863909, "road": [[14, 3], [21, 0]], "blocked": false, "id": [14, 3]}
+    ],
+    [
+      {"dist": 7.0, "road": [[0, 0], [7, 0]], "blocked": false, "id": [0, 0]},
+      {"dist": 7.0, "road": [[7, 0], [14, 0]], "blocked": false, "id": [14, 0]}
+    ],
+    [
+      {"dist": 7.0, "road": [[7, 0], [14, 0]], "blocked": false, "id": [7, 0]},
+      {"dist": 7.0, "road": [[14, 0], [21, 0]], "blocked": false, "id": [21, 0]},
+      {"dist": 3.0, "road": [[14, 3], [14, 0]], "blocked": false, "id": [14, 3]}
+    ],
+    [
+      {"dist": 5.0, "road": [[0, 0], [4, 3]], "blocked": false, "id": [0, 0]},
+      {"dist": 5.0, "road": [[4, 3], [9, 3]], "blocked": false, "id": [9, 3]}
+    ],
+    [
+      {"dist": 5.0, "road": [[4, 3], [9, 3]], "blocked": false, "id": [4, 3]},
+      {"dist": 5.0, "road": [[9, 3], [14, 3]], "blocked": false, "id": [14, 3]}
+    ],
+    [
+      {"dist": 5.0, "road": [[9, 3], [14, 3]], "blocked": false, "id": [9, 3]},
+      {"dist": 3.0, "road": [[14, 3], [14, 0]], "blocked": false, "id": [14, 0]},
+      {"dist": 7.615773105863909, "road": [[14, 3], [21, 0]], "blocked": false, "id": [21, 0]}
+    ]
+  ]
+
+}
