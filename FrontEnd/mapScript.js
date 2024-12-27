@@ -85,6 +85,18 @@ function clearPreviousRound() {
     neighbourMarkers.forEach(function(marker) {marker.remove()});
     requestNeighbours(start);
 }
+function clearMap() {
+    
+    // for some reason the start and end points are not disapearing
+
+    optimalPathLine.remove();
+    startMarker.remove();
+    endMarker.remove();
+    blockedRoadsFeatureGroup.clearLayers();
+    pathLine.remove();
+    neighbourMarkers.forEach(function(marker) {marker.remove()});
+    
+}
 
 // Shows adjacent neighbours in the map and makes them clickable
 function showNeighbours() {

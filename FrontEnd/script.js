@@ -118,7 +118,6 @@ const menu = document.querySelector('#menu');
 const routeNumber = document.querySelector('#routeNumber');
 const resetButton = document.querySelector('#reset');
 const distanceReset = document.querySelector('#distanceReset');
-const progressBarContainer = document.querySelector('#progressBarContainer');
 const nextRoundButton = document.querySelector('#nextRoundButton');
 
 
@@ -204,6 +203,8 @@ async function requestNeighbours(coords) {
 
 async function startGame(){
     try{
+        distance = 0;
+        scoreText.innerHTML = distance;
         const data = await initializeFlask();
         console.log(data);
         console.log("Data received");
@@ -239,11 +240,7 @@ function resetGame() {
 
     distance = 0;
     scoreText.innerHTML = distance;
-    // menu.style.display = "block";
-
-    // path = [startMarker.getLatLng()]
-    // polyline.setLatLngs(path);
-    progressBarContainer.style.display = "none";
+    hideProgressBar();
     startNewRound();
 
 
@@ -273,7 +270,6 @@ function updateDistance(addition) {
 
 function endRound() {
     console.log("Round ended. Score: ", optimalDistance, "/", distance, "=", 100*optimalDistance/distance);
-    progressBarContainer.style.display = "block";
     if(distance < optimalDistance){
         showProgressBar(100);
     }
@@ -305,22 +301,28 @@ function showProgressBar(percentage) {
     progressText.textContent = `Score: ${percentage}%`;
 }
 
+function hideProgressBar() {
+    const progressBarContainer = document.getElementById("progressBarContainer");
+    progressBarContainer.style.display = "none";
+}
+
 function nextRound() {
     console.log("Going into next round");
     // I cannot add the start from the end point since the functionality doesnt exist on the backend
     currentRound++;
     if (currentRound === routesNum) {
-        console.log("Game finished");
         finishGame();
     }
     else{
         startGame()
         loadData(data);
-        progressBarContainer.style.display = "none";
+        hideProgressBar();
+        clearMap();
         startNewRound(true);
     }
 }
 
 function finishGame() {
     // A page will appear saying the game is finished and will have a button to reload the page to start again
+    console.log("Game finished");
 }
