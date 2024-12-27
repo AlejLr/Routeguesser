@@ -102,6 +102,8 @@ let distance = 0;
 let difficulty = 50;
 let routesNum = 3;
 let currentRound = 0;
+let finalDistance = 0;
+let finalOptimalDistance = 0;
 
 let blockedRoads;
 let neighbours;
@@ -121,6 +123,13 @@ const resetButton = document.querySelector('#reset');
 const distanceReset = document.querySelector('#distanceReset');
 const nextRoundButton = document.querySelector('#nextRoundButton');
 const startGame = document.querySelector('#startGame');
+const playAgainButton = document.querySelector('#playAgainButton');
+
+const finalBarContainer = document.getElementById("finalBarContainer");
+
+// const progressBarContainer = document.getElementById("progressBarContainer");
+// const progressFill = document.getElementById("progressFill");
+// const progressText = document.getElementById("progressText");
 
 
 easyButton.onclick = setDifficultyEasy;
@@ -128,6 +137,7 @@ mediumButton.onclick = setDifficultyMedium;
 hardButton.onclick = setDifficultyHard;
 resetButton.onclick = resetGame;
 nextRoundButton.onclick = nextRound;
+playAgainButton.onclick = finishGame;
 //startGame.onclick = hideStartScreen;
 
 routeNumber.addEventListener('input', updateRoutesNum);
@@ -239,11 +249,11 @@ function setDifficultyHard() {
 }
 
 function resetGame() {
-    console.log("Resetting. Work in progress")
+    console.log("Resetting")
 
     distance = 0;
     scoreText.innerHTML = distance;
-    hideProgressBar();
+    barContainer.style.display = "none";
     clearMap();
     startNewRound();
 
@@ -273,56 +283,54 @@ function updateDistance(addition) {
 }
 
 function endRound() {
+    finalDistance += distance;
+    finalOptimalDistance += optimalDistance;
     if(distance === 0){
-        showProgressBar(0);
+        showBar(0, "progress");
         return;
     }
 
     // const percentage = Math.min(100, Math.round(100*(optimalDistance/distance))); // I'm not sure if the score should be capped at 100, but anyways, it's better left uncapped for debugging
     percentage = Math.round(100*(optimalDistance/distance));
-    showProgressBar(percentage);
+    showBar(percentage, "progress");
 }
 
-function showProgressBar(percentage) {
-    const progressBarContainer = document.getElementById("progressBarContainer");
-    const progressFill = document.getElementById("progressFill");
-    const progressText = document.getElementById("progressText");
+function showBar(percentage, bar) {
+    barContainer = document.getElementById(bar+"BarContainer");
+    barFill = document.getElementById(bar+"Fill");
+    barText = document.getElementById(bar+"Text");
 
-    progressBarContainer.style.display = 'block';
+    barContainer.style.display = 'block';
 
-    progressFill.style.width = "0";
-    progressFill.style.backgroundColor = "red";
+    barFill.style.width = "0";
+    barFill.style.backgroundColor = "red";
 
     setTimeout(() => {
-        progressFill.style.width = `${percentage}%`;
+        barFill.style.width = `${percentage}%`;
 
-        if (percentage < 33) {
-            progressFill.style.backgroundColor = "red";
-        } else if (percentage < 66) {
-            progressFill.style.backgroundColor = "yellow";
+        if (percentage < 50) {
+            barFill.style.backgroundColor = "red";
+        } else if (percentage < 80) {
+            barFill.style.backgroundColor = "yellow";
         } else {
-            progressFill.style.backgroundColor = "green";
+            barFill.style.backgroundColor = "green";
         }
     }, 100);
 
-    progressText.textContent = `Score: ${percentage}%`;
-}
-
-function hideProgressBar() {
-    const progressBarContainer = document.getElementById("progressBarContainer");
-    progressBarContainer.style.display = "none";
+    barText.textContent = `Score: ${percentage}%`;
 }
 
 function nextRound() {
     console.log("Going into next round");
     // I cannot add the start from the end point since the functionality doesnt exist on the backend
+    barContainer.style.display = "none";
     currentRound++;
     if (currentRound === routesNum) {
-        finishGame();
+        percentage = Math.round(100*(finalOptimalDistance/finalDistance));
+        showBar(percentage,"final");
     }
     else{
         clearMap();
-        hideProgressBar();
         initializeGame();
         // clearMap();
         // startNewRound(true);

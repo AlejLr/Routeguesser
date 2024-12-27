@@ -165,7 +165,7 @@ input[type="number"]{
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 80%;
+    width: 60%;
     text-align: center;
     z-index: 1000;
     display: none;
@@ -176,7 +176,23 @@ input[type="number"]{
     border-radius: 8px;
 }
 
-#progressBar {
+#finalBarContainer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    text-align: center;
+    z-index: 1000;
+    display: none;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #000000e2;
+    border-radius: 8px;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+div.bar {
     width: 100%;
     background-color: #e0e0e0;
     border-radius: 8px;
@@ -187,7 +203,7 @@ input[type="number"]{
     border-radius: 8px;
 }
 
-#progressFill {
+div.barFill {
     height: 100%;
     background-color: red;
     width: 0;
@@ -196,7 +212,7 @@ input[type="number"]{
 }
 
 /* Progress Text */
-#progressText {
+div.barText {
     font-size: 16px;
     font-weight: bold;
     color: #333;
