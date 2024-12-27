@@ -58,12 +58,21 @@
     </div>
 
     <div id="progressBarContainer" class="hidden">
-        <p id="progressText"></p>
-        <div id="progressBar">
-            <div id="progressFill"></div>
+        <p id="progressText" class="barText"></p>
+        <div id="progressBar" class="bar">
+            <div id="progressFill" class="barFill"></div>
         </div>
         <button id="nextRoundButton" class="difButton">Next round</button>
     </div>
+
+    <div id="finalBarContainer">
+        <p>Congratulations! You finished the game</p>
+        <p id="finalText" class="barText"></p>
+        <div id="finalBar" class="bar">
+            <div id="finalFill" class="barFill"></div>
+        </div>
+        <button id="playAgainButton">Play again</button>
+    </div>    
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
