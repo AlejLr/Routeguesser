@@ -1,0 +1,60 @@
+[out:json];
+
+//The query that returns the data for map_full
+
+
+area["landuse"="residential"]["note"="Maredijkbuurt"]->.m;
+area["landuse"="residential"]["note"="De Kooi"]->.k;
+area["landuse"="residential"]["note"="Noorderkwartier"]->.n;
+area["landuse"="residential"]["note"="Binnenstad"]->.b;
+area["landuse"="industrial"]["name"="De Waard"]->.w;
+(
+  node["landuse"="residential"][!"name"][!"note"](52.148,4.496,52.152,4.5);
+  way["landuse"="residential"][!"name"][!"note"](52.148,4.496,52.152,4.5);
+)->.unnamed;
+
+
+
+
+(
+  way["highway"~"residential|secondary|tertiary|pedestrian|service"](area.m);
+  way["highway"~"residential|secondary|tertiary|pedestrian|service"](area.k);
+  way["highway"~"residential|secondary|tertiary|pedestrian|service"](area.n);
+  way["highway"~"residential|secondary|tertiary|pedestrian|service"](area.b);
+  way["highway"~"residential|secondary|tertiary|pedestrian|service|unclassified"](area.w);
+  way["highway"~"residential|secondary|tertiary|pedestrian|service"](area.unnamed);
+
+//Stationsplein
+ way(149784143);
+ way(52507453);
+
+ //Oosterkerkstraat
+  way(7449810);
+  way(14945798);
+
+//Lammenschansweg and connective roads
+
+  way["highway"~"residential|secondary|tertiary|pedestrian|service"]["name"~"Lammenschansweg|Koninginnelaan|Geregracht|Leliestraat|Lorentzkade"](52.14738,4.49133,52.15436,4.49525);
+
+ //De Sitterlaan and connective roads
+ way["highway"~"residential|secondary|tertiary|pedestrian|service"]["name"~"De Sitterlaan|Kamerlingh Onnesplein"](52.14707,4.49133,52.14841,4.50070);
+
+  //Kooilaan and connective roads
+ way["highway"~"residential|secondary|tertiary|pedestrian|service"]["name"~"Kooilaan|Herensingel|Kooiplein"](52.16135,4.50482,52.16840,4.50800);
+
+    //Julianastraat and connective roads
+  way(7450056);
+  way(9087289);
+  way(7450152);
+ way["highway"]["name"~"Julianastraat|Anna Paulownastraat|Herenpoortsbrug|Oude Herengracht"](52.16196,4.49654,52.16825,4.50075);
+
+ //Zijlsingel bridge
+  way(14945511);
+  way(14945508);
+
+
+
+);
+
+
+out geom;

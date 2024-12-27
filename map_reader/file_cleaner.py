@@ -25,6 +25,8 @@ from networkx import adjacency_data
 from networkx import adjacency_graph
 import matplotlib.pyplot as plt
 from collections import defaultdict
+from decimal import Decimal
+
 
 new_json = []
 from networkx.readwrite import json_graph
@@ -48,38 +50,42 @@ def file_cleaner(in_file_name, out_file_name):
                     trimmed_road = road[1:-1]
                     not_nodes.update(set(trimmed_road))
 
-    all_connected_components = sorted(nx.connected_components(raw_graph), key=len, reverse=True)
-    frozen_graph = raw_graph.subgraph(all_connected_components[0])
-    main_graph = nx.Graph(frozen_graph)
 
 
-    #   IMPORTANT: THIS NODE IS SCREWING EVERYTHING UP.
-    #   CHECK FOR LATER
-    main_graph.remove_node((52.161096, 4.499861))
 
-    global edges_to_split
-    edges_to_split = to_split(main_graph)
-    global splitted_edges
-    splitted_edges = []
-    splitted_edges = splitter(main_graph,edges_to_split)
 
-    main_graph.remove_edges_from(edges_to_split)
+    # Values used just for testing purposes
 
     global edges_to_join
+    global edges_to_split
+    global splitted_edges
+
+    for n in range(4):
+        edges_to_split = to_split(raw_graph)
+        splitted_edges = splitter(raw_graph,edges_to_split)
+        raw_graph.remove_edges_from(edges_to_split)
+
+    main_graph = extract_main_component(raw_graph)
+
     edges_to_join = to_join(main_graph)
 
-    for n in range(2):
+    for n in range(3):
         joiner(main_graph)
 
-    all_connected_components = sorted(nx.connected_components(main_graph), key=len, reverse=True)
-    frozen_graph = main_graph.subgraph(all_connected_components[0])
-    final_graph = nx.Graph(frozen_graph)
+
+    final_graph = extract_main_component(main_graph)
 
 
     new_json = adjacency_data(final_graph, attrs={'id': 'id', 'key': 'key'})
 
     with open(out_file_name, "w") as outfile:
         json.dump(new_json, outfile)
+
+
+def extract_main_component(graph):
+    all_connected_components = sorted(nx.connected_components(graph), key=len, reverse=True)
+    frozen_graph = graph.subgraph(all_connected_components[0])
+    return nx.Graph(frozen_graph)
 
 def to_split(graph):
     """
@@ -101,7 +107,7 @@ def to_split(graph):
             trimmed_road = road[1:-1]
             for node in graph.nodes:
                 if node in trimmed_road:
-                    edges_to_split[(n1, n2)][0] = road
+                    edges_to_split[(n1,n2)][0] = road
                     edges_to_split[(n1,n2)][1].add(node)
 
     return edges_to_split
@@ -111,16 +117,20 @@ def splitter(graph, edges_to_split):
     splitted_edges = []
 
     for edge in edges_to_split:
-        road = edges_to_split[edge][0]
+
         new_roads = []
         left = []
 
+        road = edges_to_split[edge][0]
         nodes = edges_to_split[edge][1]
+
         for ind, point in enumerate(road):
              if point in nodes:
                  new_roads.append(road[:ind+1])
                  left = road[ind:]
-        new_roads.append(left)
+
+        if left:
+            new_roads.append(left)
 
         splitted_edges.append(new_roads)
 
@@ -129,6 +139,7 @@ def splitter(graph, edges_to_split):
                                         blocked=False)
 
     return splitted_edges
+
 
 
 def to_join(graph):
@@ -163,7 +174,8 @@ def joiner(graph):
                 graph.remove_node(node)
 
 def euclidean_dist(node1, node2):
-    return ((node1[0] - node2[0])**2 + (node1[1] - node2[1])**2)**0.5
+
+    return float((Decimal(node1[0] - node2[0]) ** Decimal(2) + Decimal(node1[1] - node2[1]) ** Decimal(2)) ** Decimal(0.5))
 def dist(points):
     return sum(euclidean_dist(points[i], points[i + 1]) for i in range(len(points) - 1))
 
@@ -193,7 +205,7 @@ def visualize_degrees(graph):
     degrees = dict(graph.degree())
 
     node_color_map = []
-    for degree in degrees.values():
+    for node, degree in degrees.items():
         if degree == 0:
             node_color_map.append('black')
         elif degree == 1:
@@ -201,8 +213,9 @@ def visualize_degrees(graph):
             node_color_map.append('red')
         elif degree == 2:
             node_color_map.append('orange')
-        elif degree > 6:
+        elif degree > 12:
             node_color_map.append('violet')
+            print(node)
         else:
             node_color_map.append('green')
 
@@ -252,6 +265,6 @@ def _create_graph(graph_file):
 
     return graph
 
-file_cleaner("map_complete.geojson", "complex_graph2.json")
+file_cleaner("map_full.geojson", "complex_graph2.json")
 graph = _create_graph("complex_graph2.json")
 visualize_degrees(graph)
