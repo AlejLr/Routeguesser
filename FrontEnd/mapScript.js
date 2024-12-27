@@ -34,25 +34,23 @@ circleIcon = L.icon({
 startIcon = L.icon({
     iconUrl: 'start_marker_icon.png',
     iconSize: [32, 48],
-    iconAnchor: [16, 24],
-    popupAnchor:  [16, 24]
+    iconAnchor: [16, 48],
+    popupAnchor:  [16, 48]
 });
 
 //Create endIcon
 endIcon = L.icon({
     iconUrl: 'end_marker_icon.png',
     iconSize: [32, 48],
-    iconAnchor: [16, 24],
-    popupAnchor:  [16, 24]
+    iconAnchor: [16, 48],
+    popupAnchor:  [16, 48]
 });
 
 
 // Shows the new optimal path (it shows it from the start for now. This is not permanent) and the new blocked roads (called blocked nodes, but they are roads)
-// firsTime simbolises if it's the first time the function is called
-function startNewRound(firstTime=false) {
-    if (!firstTime) clearPreviousRound()
+function startNewRound() {
     optimalPathLine = L.polyline(optimalPath, {color: '#78a100'});
-    optimalPathLine.addTo(map);
+    // optimalPathLine.addTo(map);
     blockedRoadsFeatureGroup = L.featureGroup();
     // blockedEdges is an array with the start and end points of the blocked roads
     blockedEdges = [];
@@ -62,7 +60,7 @@ function startNewRound(firstTime=false) {
     }
     blockedRoadsFeatureGroup.addTo(map);
 
-    startMarker = L.marker(start, {zIndexOffset: -1000}).addTo(map).bindPopup("Start");
+    startMarker = L.marker(start, {icon: startIcon, zIndexOffset: -1000}).addTo(map).bindPopup("Start");
     endMarker = L.marker(end, {icon: endIcon, zIndexOffset: -999}).addTo(map).bindPopup("End");
     neighbourMarkers = [];
 
@@ -76,44 +74,45 @@ function startNewRound(firstTime=false) {
     map.fitBounds([startMarker.getLatLng(), endMarker.getLatLng()], {padding: [0.4, 0.4]});
 }
 
-function clearPreviousRound() {
+function clearMap() {
     optimalPathLine.remove();
     startMarker.remove();
     endMarker.remove();
     blockedRoadsFeatureGroup.clearLayers();
     pathLine.remove();
     neighbourMarkers.forEach(function(marker) {marker.remove()});
-    requestNeighbours(start);
+    // requestNeighbours(start);
+    console.log("Cleared map")
 }
-function clearMap() {
-    // Remove the optimal path line
-    if (optimalPathLine) {optimalPathLine.remove();}
+// function clearMap() {
+//     // Remove the optimal path line
+//     if (optimalPathLine) {optimalPathLine.remove();}
 
-    // Remove the start marker
-    if (startMarker) {startMarker.remove();}
+//     // Remove the start marker
+//     if (startMarker) {startMarker.remove();}
 
-    // Remove the end marker
-    if (endMarker) {endMarker.remove();}
+//     // Remove the end marker
+//     if (endMarker) {endMarker.remove();}
 
-    // Clear the blocked roads feature group
-    if (blockedRoadsFeatureGroup) {
-        blockedRoadsFeatureGroup.clearLayers();
-    }
+//     // Clear the blocked roads feature group
+//     if (blockedRoadsFeatureGroup) {
+//         blockedRoadsFeatureGroup.clearLayers();
+//     }
 
-    // Remove the path line
-    if (pathLine) {pathLine.remove();}
+//     // Remove the path line
+//     if (pathLine) {pathLine.remove();}
 
-    // Remove all neighbour markers
-    if (neighbourMarkers && neighbourMarkers.length > 0) {
-        neighbourMarkers.forEach(function(marker) {
-            marker.remove();
-        });}
+//     // Remove all neighbour markers
+//     if (neighbourMarkers && neighbourMarkers.length > 0) {
+//         neighbourMarkers.forEach(function(marker) {
+//             marker.remove();
+//         });}
 
-    // Reset the variables
-    neighbourMarkers = [];
-    path = [];
-    detailedPath = [];
-}
+//     // Reset the variables
+//     neighbourMarkers = [];
+//     path = [];
+//     detailedPath = [];
+// }
 
 // Shows adjacent neighbours in the map and makes them clickable
 function showNeighbours() {

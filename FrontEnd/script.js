@@ -194,6 +194,7 @@ async function requestNeighbours(coords) {
 
         const data = await response.json();
         neighbours = data["neighbours"];
+        console.log("Requested neighbours")
         showNeighbours();
     }
     catch(error){
@@ -211,7 +212,7 @@ async function initializeGame(){
         console.log(data);
         console.log("Data received");
         loadData(data);
-        startNewRound(true);
+        startNewRound();
         // test();
     }
     catch(error){
@@ -243,6 +244,7 @@ function resetGame() {
     distance = 0;
     scoreText.innerHTML = distance;
     hideProgressBar();
+    clearMap();
     startNewRound();
 
 
@@ -276,7 +278,8 @@ function endRound() {
         return;
     }
 
-    const percentage = Math.min(100, Math.round(100*(optimalDistance/distance)));
+    // const percentage = Math.min(100, Math.round(100*(optimalDistance/distance))); // I'm not sure if the score should be capped at 100, but anyways, it's better left uncapped for debugging
+    percentage = Math.round(100*(optimalDistance/distance));
     showProgressBar(percentage);
 }
 
@@ -318,10 +321,11 @@ function nextRound() {
         finishGame();
     }
     else{
-        initializeGame();
-        hideProgressBar();
         clearMap();
-        startNewRound(true);
+        hideProgressBar();
+        initializeGame();
+        // clearMap();
+        // startNewRound(true);
     }
 }
 
