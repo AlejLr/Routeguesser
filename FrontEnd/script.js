@@ -110,6 +110,7 @@ let optimalPath;
 let end;
 let start;
 
+
 const scoreText = document.querySelector('#distanceText');
 const easyButton = document.querySelector('#easy');
 const mediumButton = document.querySelector('#medium');
@@ -119,7 +120,7 @@ const routeNumber = document.querySelector('#routeNumber');
 const resetButton = document.querySelector('#reset');
 const distanceReset = document.querySelector('#distanceReset');
 const nextRoundButton = document.querySelector('#nextRoundButton');
-
+const startGame = document.querySelector('#startGame');
 
 
 easyButton.onclick = setDifficultyEasy;
@@ -127,9 +128,10 @@ mediumButton.onclick = setDifficultyMedium;
 hardButton.onclick = setDifficultyHard;
 resetButton.onclick = resetGame;
 nextRoundButton.onclick = nextRound;
-startGame.onclick = hideStartScreen;
+//startGame.onclick = hideStartScreen;
 
 routeNumber.addEventListener('input', updateRoutesNum);
+
 
 
 // Geting the information thorugh Flask
@@ -201,7 +203,7 @@ async function requestNeighbours(coords) {
 
 // Rest of the functions
 
-async function startGame(){
+async function initializeGame(){
     try{
         distance = 0;
         scoreText.innerHTML = distance;
@@ -220,19 +222,19 @@ async function startGame(){
 function setDifficultyEasy() {
     difficulty = 0;
     menu.style.display = "none";
-    startGame();
+    initializeGame();
 }
 
 function setDifficultyMedium() {
     difficulty = 50;
     menu.style.display = "none";
-    startGame();
+    initializeGame();
 }
 
 function setDifficultyHard() {
     difficulty = 100;
     menu.style.display = "none";
-    startGame();
+    initializeGame();
 }
 
 function resetGame() {
@@ -269,11 +271,13 @@ function updateDistance(addition) {
 }
 
 function endRound() {
-    console.log("Round ended. Score: ", optimalDistance, "/", distance, "=", 100*optimalDistance/distance);
-    if(distance < optimalDistance){
-        showProgressBar(100);
+    if(distance === 0){
+        showProgressBar(0);
+        return;
     }
-    showProgressBar(Math.round(100*(optimalDistance/distance)));
+
+    const percentage = Math.min(100, Math.round(100*(optimalDistance/distance)));
+    showProgressBar(percentage);
 }
 
 function showProgressBar(percentage) {
@@ -281,7 +285,7 @@ function showProgressBar(percentage) {
     const progressFill = document.getElementById("progressFill");
     const progressText = document.getElementById("progressText");
 
-    progressBarContainer.style.display = "block";
+    progressBarContainer.style.display = 'block';
 
     progressFill.style.width = "0";
     progressFill.style.backgroundColor = "red";
@@ -314,8 +318,7 @@ function nextRound() {
         finishGame();
     }
     else{
-        startGame()
-        loadData(data);
+        initializeGame();
         hideProgressBar();
         clearMap();
         startNewRound(true);
@@ -325,4 +328,5 @@ function nextRound() {
 function finishGame() {
     // A page will appear saying the game is finished and will have a button to reload the page to start again
     console.log("Game finished");
+    location.reload();
 }

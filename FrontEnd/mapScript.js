@@ -86,16 +86,33 @@ function clearPreviousRound() {
     requestNeighbours(start);
 }
 function clearMap() {
-    
-    // for some reason the start and end points are not disapearing
+    // Remove the optimal path line
+    if (optimalPathLine) {optimalPathLine.remove();}
 
-    optimalPathLine.remove();
-    startMarker.remove();
-    endMarker.remove();
-    blockedRoadsFeatureGroup.clearLayers();
-    pathLine.remove();
-    neighbourMarkers.forEach(function(marker) {marker.remove()});
-    
+    // Remove the start marker
+    if (startMarker) {startMarker.remove();}
+
+    // Remove the end marker
+    if (endMarker) {endMarker.remove();}
+
+    // Clear the blocked roads feature group
+    if (blockedRoadsFeatureGroup) {
+        blockedRoadsFeatureGroup.clearLayers();
+    }
+
+    // Remove the path line
+    if (pathLine) {pathLine.remove();}
+
+    // Remove all neighbour markers
+    if (neighbourMarkers && neighbourMarkers.length > 0) {
+        neighbourMarkers.forEach(function(marker) {
+            marker.remove();
+        });}
+
+    // Reset the variables
+    neighbourMarkers = [];
+    path = [];
+    detailedPath = [];
 }
 
 // Shows adjacent neighbours in the map and makes them clickable
