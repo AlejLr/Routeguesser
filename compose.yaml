@@ -1,10 +1,16 @@
+# This file is used to manage the communication between the frontend and the backend containers.
+# It contains information such as the directories of the containers, the ports that will be open and
+# the network that will be used to connect the containers.
+
+
+
 services:
   backend:
     build:
       context: ./map_reader  
       dockerfile: Dockerfile 
     ports:
-      - "5000:5000"  # map port 5000 in the container to port 5000 on the host machine
+      - "5000:5000" 
     container_name: backend-container  
     environment:
       FLASK_APP: main.py  

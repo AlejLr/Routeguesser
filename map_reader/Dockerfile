@@ -1,5 +1,8 @@
 # syntax=docker/dockerfile:1
 
+# This is a backend container Dockerfile, using the official python image.
+# It runs a Flask application that serves the frontend.
+
 ARG PYTHON_VERSION=3.11.9
 FROM python:${PYTHON_VERSION}-slim AS base
 

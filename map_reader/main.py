@@ -8,10 +8,11 @@ CORS(app)
 # when frontend sends requests with updated player position
 game = Map("complex_graph2.json")
 
-def send_start(data):
+def send_start(data: dict) -> dict:
     """
     sends the start, end and blocked nodes to the UI in a JSON file
     Keep tracks of the round to reset start and end when needed
+    :rtype dict:
     """
     game.game_init(data["difficulty"])
     return jsonify({"start" : game.start, 
@@ -19,24 +20,23 @@ def send_start(data):
                     "blocked nodes": game.blocked_roads, 
                     "neighbours": game.get_neighbours_and_roads(game.current_pos), 
                     "optimal path" :  game.optimal_path, 
-                    "optimal distance" : float(game.optimal_distance)})
+                    "optimal distance" : game.optimal_distance})
 
-def send_neighbours(data):
+def send_neighbours(data: dict) -> dict:
     """
     calls generate neighbours and sends to the UI a JSON file with them
+    :rtype dict:
     """
     return jsonify({"neighbours": game.get_neighbours_and_roads(data["current"])})
 
 
 @app.route('/main', methods=['POST'])
-def main():
+def main() -> dict:
     """
     processes the inputs from the webpage
+    :rtype dict:
     """
     data = request.get_json()
-    
-    #print("Received data:", data)  # Debugging :)
-    
     
     if data["type"] == "start":
         return send_start(data)
@@ -48,4 +48,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # run the server, open it on all ports
     app.run(debug=True, host='0.0.0.0', port=5000)

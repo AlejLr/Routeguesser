@@ -1,3 +1,7 @@
+# This is the Dockerfile for the frontend container
+# It uses the official Nginx image as the base and runs the html application on nginx
+
+
 # use the official Nginx image as the base
 FROM nginx:latest
 

@@ -14,18 +14,17 @@ Road = list[Node]
 
 class Map:
     """
-    A map is a dynamic data structure.
-    A map contains a set of Points that are contained within its borders.
-    The Map will contain the call to the solving algorithm.
-    The Map will be able to export data in a presentable manner for the UI.
-    (CONSIDER) The greater Map will be composed by multiple smaller Maps so that we can work in chunks based on zoom in.
+    The Map class is used to create a game scenario based on a graph and the player's position. It contains 
+    the start and end nodes, the blocked roads, the optimal path and distance, and the player's current position.
+    It is also able process the player's inputs to change the player's position in real time using process_inputs().
     """
 
     def __init__(self, graph_file: str) -> None:
         """
         Initializes the Map object, by giving it a random serial number and creating a graph to be used in the future.
         It also declares all the object variables that will be used in later methods.
-        :param graph_file: The name/directory of a cleaned json file containing the graph info.
+        :param graph_file (str): The name/directory of a cleaned json file containing the graph info.
+        :rtype (None):
         """
         # Base and unchanging object variables
         self.serial: int = random.randint(0, 200)
@@ -51,7 +50,8 @@ class Map:
         """
         Game initialization method, creates a new game scenario in the same Map object, this reduces the power
         consumption as the files are already read and only the basic variables need updating.
-        :param difficulty: The number of randomly generated blocked roads.
+        :param difficulty (int): The number of randomly generated blocked roads.
+        :rtype (None):
         """
         # Print the Map object serial number to know which is used in case of multiple game instances
         print(self.serial)
@@ -71,7 +71,8 @@ class Map:
 
     def new_round(self) -> None:
         """
-        Reset part of the game scenario to continue in the same game as a new round.
+        Reset part of the game scenario to continue in the same game as a new round as a side effect
+        :rtype (None):
         """
         # Set the new starting and goal locations
         self.start = self.end
@@ -85,8 +86,8 @@ class Map:
     def _create_graph(graph_file: str) -> nx.Graph:
         """
         A static method that creates a connected graph used in the Map object by reading a cleaned json file.
-        :param graph_file: The name/directory of the cleaned json file containing the graph info.
-        :return: The NetworkX Graph created.
+        :param graph_file (str): The name/directory of the cleaned json file containing the graph info.
+        :rtype nx.Graph: The NetworkX Graph created.
         """
         # Very basic error handling
         if not graph_file.endswith('.json'):
@@ -123,9 +124,10 @@ class Map:
     def generate_blocked_roads(self, number_of_blocked_nodes: int) -> list[Road]:
         """
         Generate a list of a certain number roads that can be blocked while maintaining the graph connectivity.
-        Modifies the graph contained in the Map object to set the blocked attribute as true for the roads.
+        Modifies as a side effect the graph contained in the Map object to set the blocked attribute as true for the roads and also returns
+        the list of blocked roads, which is needed for the frontend.
         :param number_of_blocked_nodes: The goal number of blocked roads.
-        :return: A list of the roads that have been modified in the graph to be blocked.
+        :rtype list(Road): A list of the roads that have been modified in the graph to be blocked.
         """
         # Basic local variables that help operate the method
         copy_g: nx.Graph = nx.Graph(self.Graph)  # A copy of the graph
@@ -136,8 +138,7 @@ class Map:
         # Try to block as many roads as possible till the goal is reached
         while len(road_edges) < number_of_blocked_nodes:
             if len(possible_edges) < 1:
-                print("Was not able to remove desired amount of edges.")
-                break
+                raise Exception("Was not able to remove desired amount of edges.")
 
             # Choose a random edge and remove it from the possibilities
             try_remove: tuple[Node] = random.choice(possible_edges)
@@ -161,6 +162,7 @@ class Map:
     def reset_blocked_roads(self) -> None:
         """
         Resets all edges to be unblocked.
+        :rtype (None):
         """
         nx.set_edge_attributes(self.Graph, False, name="blocked")
 
@@ -169,7 +171,7 @@ class Map:
         Generates a random tuple of start and end nodes, if they match the distance then they are returned, otherwise
         the distance factor is reduced until a valid pair is found.
         :param min_distance: The preferred minimum distance between the starting and ending nodes.
-        :return: A tuple of start and end nodes.
+        :rtype tuple(Node, Node):.
         """
         # Get nodes list
         nodes: list[Node] = list(self.Graph.nodes)
@@ -185,12 +187,14 @@ class Map:
             if self.calculate_cartesian_distance(start, end)*Decimal(10000) >= Decimal(min_distance):
                 return start, end
 
+        raise Exception("Was not able to generate a valid start and end node pair with the current min_distance. Maybe try a lower value?")
+    
     def generate_end(self, min_distance: int = 100) -> Node:
         """
         Generates a random end node, it is returned when it matches the minimum distance requirement which decreases
         with each iteration to prevent an infinite loop.
-        :param min_distance: The preferred minimum distance between current player position and end goal.
-        :return: A random end node.
+        :param min_distance (int): The preferred minimum distance between current player position and end goal.
+        :rtype Node:
         """
         # Get nodes list
         nodes: list[Node] = list(self.Graph.nodes)
@@ -203,12 +207,13 @@ class Map:
             # Valid end point is found, return it
             if self.calculate_cartesian_distance(self.start, end) * Decimal(10000) >= Decimal(min_distance):
                 return end
+            
+        raise Exception("Was not able to generate a valid end node with the current min_distance. Maybe try a lower value?")
 
-    def astar(self) -> tuple[Road, Decimal]:
+    def astar(self) -> tuple[Road, float]:
         """
-        generate an optimal path(s) between start and end
-        returns: dict of nodes (which contain coordinates) and their scores, the score being the value (length of the path for now)
-        rtype: tuple(list(Graph.node), float)
+        generate an optimal path(s) between start and end and return the path and it's total distance
+        :rtype tuple(list(Road), float):
         """
         start: Node
         end: Node
@@ -218,7 +223,6 @@ class Map:
         priority_queue.put((0, start, 0))
         self.history = {start: (None, 0)}
         self.astar_solver(priority_queue, end, False)
-        # return self.get_optimal_path_and_distance(end)
         return self.get_optimal_path_and_distance(end)
 
     def astar_solver(self, priority_queue: PriorityQueue, end: Node, exclude_blocked: bool = True) -> None:
@@ -227,7 +231,11 @@ class Map:
         using calculate_cartesian_distance we calculate for every node its' distance to the end in a straight line
         We use this to judge which node is best to visit next
 
-        This function modifies self.__history__ as a side effect
+        This function modifies self.history as a side effect
+        :param priority_queue (PriorityQueue): The queue of nodes to visit.
+        :param end (Node): The end node of the path.
+        :param exclude_blocked (bool): If blocked roads should be excluded from the path.
+        :rtype (None):
         """
         done: bool = False
 
@@ -259,14 +267,16 @@ class Map:
         if not done:
             raise Exception("No path found for the astar algorithm")
 
-    def get_optimal_path_and_distance(self, end: Node) -> tuple[Road, Decimal]:
+    def get_optimal_path_and_distance(self, end: Node) -> tuple[Road, float]:
         """
-        returns the optimal path from the start to the end, using self.__history__
-        rtype: list(Graph.node)
+        Returns the optimal path and distance from the start to the end node
+        based on self.history. This function must only be called after astar_solver has been called.
+        :param end (Node): The end node of the path.
+        :rtype tuple(Road, float):
         """
         path: Road = []
         current: Node = end
-        path_distance: Decimal = self.history[end][1]
+        path_distance: float = float(self.history[end][1])
         while current is not None:
             path.append(current)
             current = self.history[current][0]
@@ -276,63 +286,62 @@ class Map:
         complete_road: Road = [path[0]]
         previous: Node = path[0]
         for node in path[1:]:
-            edge: Road = self.Graph[node][previous]["road"]
-            distance_to_first: Decimal = Map.calculate_cartesian_distance(previous, edge[0])
-            distance_to_last: Decimal = Map.calculate_cartesian_distance(previous, edge[-1])
-
-            if 1 < len(edge) and distance_to_last < distance_to_first:
-                edge = edge[::-1]
+            edge: Road = Map.clean_edge(self.Graph[previous][node]["road"], previous)
             complete_road.extend(edge + [node])
             previous = node
 
         return complete_road, path_distance
 
-    def get_neighbours_and_roads(self, node: Node) -> list[tuple[Node, Road, float]]:
+    def get_neighbours_and_roads(self, current: Node) -> list[tuple[Node, Road, float]]:
         """
-        Generates a dictionary of neighbouring nodes for each node in the graph.
-        The key are the neighbour nodes, the values the list of coordinates in between
-        By default, it returns the neighbours of the current position
-        By default, it does not return the blocked edges
-        This is the function to return to the frontend
-
-        rtype: dict(G.node, tuple(list(Graph.node), float))
+        returns the neighbours of a node and the roads connecting them
+        :param current (Node): The current node.
+        :rtype list(tuple(Node, Road, float)):
         """
-        print(self.serial)
 
         neighbour_and_roads: list[tuple[Node, Road, float]] = []
-        node: Node = node
-
         neighbour: Node
-        for neighbour in list(self.Graph.neighbors(node)):
-            edge: Road = self.Graph[neighbour][node]["road"]
-            distance_to_first: Decimal = Map.calculate_cartesian_distance(node, edge[0])
-            distance_to_last: Decimal = Map.calculate_cartesian_distance(node, edge[-1])
-
-            if 1 < len(edge) and distance_to_last < distance_to_first:
-                edge = edge[::-1]
-
-            neighbour_and_roads.append((neighbour, edge + [neighbour],
-                                        float(Decimal(self.Graph[node][neighbour]["dist"]) * Decimal(10000))))
+        for neighbour in list(self.Graph.neighbors(current)):
+            edge: Road = Map.clean_edge(self.Graph[current][neighbour]["road"], current)
+            distance: float = float(Decimal(self.Graph[current][neighbour]["dist"]) * Decimal(10000))
+            neighbour_and_roads.append((neighbour, edge + [neighbour], distance))
 
         return neighbour_and_roads
+
+    @staticmethod
+    def clean_edge(edge: Road, start_node: Node) -> Road:
+        """
+        The edges in the graph are undirected so we need to make sure that the edge is in the right direction
+        This method reverses the edge if the start node is closer to the last node in the edge than the first node
+        :param edge (Road): The edge to be cleaned.
+        :param start_node (Node): The start node of the path.
+        :rtype Road: The cleaned edge.
+        """
+        distance_to_first: Decimal = Map.calculate_cartesian_distance(start_node, edge[0])
+        distance_to_last: Decimal = Map.calculate_cartesian_distance(start_node, edge[-1])
+
+        if 1 < len(edge) and distance_to_last < distance_to_first:
+            edge = edge[::-1]
+
+        return edge
 
     def process_inputs(self, next_node: Node) -> None:
         """
         Changes the current player node position based on input received from the main module.
-        :param next_node: Coordinates of the next node.
+        :param next_node (Node): Coordinates of the next node.
+        :rtype (None):
         """
         if next_node not in self.Graph:
-            print("The node is not in the graph")
-            return None
+            raise Exception("The node is not in the graph.")
         self.current_pos = next_node
 
     @staticmethod
     def calculate_cartesian_distance(node1: Node, node2: Node) -> Decimal:
         """
         Calculates the cartesian distance between two coordinates to a high precision.
-        :param node1: A tuple containing the coordinates of the first node.
-        :param node2: A tuple containing the coordinates of the second node.
-        :return: A float representing the cartesian distance between the two nodes.
+        :param node1 (Node): A tuple containing the coordinates of the first node.
+        :param node2 (Node): A tuple containing the coordinates of the second node.
+        :rtype Decimal: A float representing the cartesian distance between the two nodes.
         """
         return (Decimal(node1[0] - node2[0]) ** 2 + Decimal(node1[1] - node2[1]) ** 2).sqrt()
 
@@ -346,7 +355,8 @@ class Map:
         Visualizes a graph and highlights a particular path if provided.
         :param path: List of nodes representing the path to be highlighted.
         """
-        # ADD ERROR HANDLING
+        if not isinstance(graph, nx.Graph) or not graph:
+            raise Exception("The graph is not a NetworkX graph or is empty.")
 
         pos = {node: node for node in graph.nodes()}  # Use node coordinates as positions
         plt.figure(figsize=(10, 10))
