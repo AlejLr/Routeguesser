@@ -365,6 +365,7 @@ class Map:
         neighbour_and_roads: list[tuple[Node, Road, float]] = []
 
         neighbour: Node
+        current = tuple(current)
         for neighbour in list(self.Graph.neighbors(current)):
             edge: Road = Map.clean_edge(self.Graph[current][neighbour]["road"], current)
             distance: float = self.Graph[current][neighbour]["dist"]
