@@ -172,9 +172,7 @@ def file_cleaner(in_file_name: str, out_file_name: str) -> None:
     while split := to_split(raw_graph):
         splitter(raw_graph, split)  # After removing, modify to match.
         raw_graph.remove_edges_from(split)
-
-    # ------------------------ CONTINUE FROM HERE ---------------------------------------
-
+        
     # Select the most optimal graph to work with
     main_graph: nx.Graph = extract_main_component(raw_graph)
 
