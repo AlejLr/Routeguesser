@@ -1,5 +1,6 @@
 import unittest
-from file_cleaner import file_cleaner, euclidean_dist, dist
+import networkx as nx
+from file_cleaner import file_cleaner, euclidean_dist, dist, extract_main_component
 
 import json
 
@@ -7,7 +8,7 @@ import json
 class TestFileCleaner(unittest.TestCase):
     def test_file_cleaner(self):
         input_file = 'file_cleaner_test_1.geojson'
-        output_file = 'file_cleaner_test_1.json'
+        output_file = 'file_cleaner_test_1_actual.json'
         test_file = 'file_cleaner_test_1_expected.json'
         file_cleaner(input_file, output_file)
 
@@ -35,8 +36,6 @@ class TestFileCleaner(unittest.TestCase):
             self.assertIsInstance(test_euclidean_dist, float)
         with self.subTest(msg="2.2) Should return correct value."):
             self.assertEqual(actual_euclidean_dist, test_euclidean_dist)
-        # with self.subTest(msg="2.3) Should check for invalid input."):  # TO-DO
-        #     pass
 
         # Clean up.
         del points
@@ -52,8 +51,6 @@ class TestFileCleaner(unittest.TestCase):
             self.assertIsInstance(test_dist, float)
         with self.subTest(msg="3.2) Should return correct value."):
             self.assertEqual(actual_dist, test_dist)
-        # with self.subTest(msg="3.3) Should check for invalid input."):  # TO-DO
-        #     pass
 
         # Clean up.
         del points
