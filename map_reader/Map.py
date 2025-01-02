@@ -287,7 +287,7 @@ class Map:
             neighbour: Node
             # Main loop of finding next possible nodes
             for neighbour in self.Graph[current]:
-                candidate_distance: float = self.history[current][1] + self.Graph[current][neighbour]["dist"]
+                candidate_distance: float = self.history[current][1] + self.Graph[current][neighbour]["dist"] * 10000
 
                 previous_distance: float = self.history[neighbour][1] if neighbour in self.history else float("inf")
 
@@ -368,7 +368,7 @@ class Map:
         current = tuple(current)
         for neighbour in list(self.Graph.neighbors(current)):
             edge: Road = Map.clean_edge(self.Graph[current][neighbour]["road"], current)
-            distance: float = self.Graph[current][neighbour]["dist"]
+            distance: float = self.Graph[current][neighbour]["dist"] * 10000
             neighbour_and_roads.append((neighbour, edge, distance))
 
         return neighbour_and_roads
