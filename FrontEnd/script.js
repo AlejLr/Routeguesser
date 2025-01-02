@@ -253,11 +253,9 @@ function resetGame() {
 
     distance = 0;
     scoreText.innerHTML = distance;
-    barContainer.style.display = "none";
+    progressBarContainer.style.display = "none";
     clearMap();
     startNewRound();
-
-
 }
 
 function updateRoutesNum() {
@@ -290,7 +288,8 @@ function endRound() {
         return;
     }
 
-    const percentage = Math.min(100, Math.round(100*(optimalDistance/distance)))
+    // const percentage = Math.min(100, Math.round(100*(optimalDistance/distance))); // I'm not sure if the score should be capped at 100, but anyways, it's better left uncapped for debugging
+    percentage = Math.round(100*(optimalDistance/distance));
     showBar(percentage, "progress");
 }
 

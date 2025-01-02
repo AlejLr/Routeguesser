@@ -69,7 +69,7 @@ function startNewRound() {
 
     pathLine = L.polyline(detailedPath, {color: '#2e80d1'}).addTo(map);
     currentPosition = start;
-    showNeighbours(path, detailedPath);
+    requestNeighbours(start);
     // console.log(startMarker.getLatLng(), endMarker.getLatLng());
     map.fitBounds([startMarker.getLatLng(), endMarker.getLatLng()], {padding: [0.4, 0.4]});
 }
@@ -124,7 +124,7 @@ function showNeighbours() {
         let endPoint = trio[0],
         subpath = trio[1],
         distance = trio[2];
-        // console.log("edge:",[currentPosition, endPoint]);
+        console.log("edge:",[currentPosition, endPoint], "distance:", distance);
 
         let edgeBlocked = false
         for (blockedEdge of blockedEdges) {
