@@ -7,8 +7,8 @@ import json
 class TestFileCleaner(unittest.TestCase):
     def test_file_cleaner(self):
         input_file = 'file_cleaner_test_1.geojson'
-        output_file = 'file_cleaner_test_1.json'
-        test_file = 'file_cleaner_test_1.json'  #FILE MISSING: 'file_cleaner_test_1_expected.json'
+        output_file = 'file_cleaner_test_1_actual.json'
+        test_file = 'file_cleaner_test_1_expected.json'
         cleaner(input_file, output_file)
 
         with open(output_file, 'r') as a_file:
@@ -52,8 +52,6 @@ class TestFileCleaner(unittest.TestCase):
             self.assertIsInstance(test_dist, float)
         with self.subTest(msg="3.2) Should return correct value."):
             self.assertEqual(actual_dist, test_dist)
-        # with self.subTest(msg="3.3) Should check for invalid input."):  # TO-DO
-        #     pass
 
         # Clean up.
         del points
