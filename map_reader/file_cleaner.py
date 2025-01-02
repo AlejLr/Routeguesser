@@ -31,7 +31,7 @@ from decimal import Decimal
 new_json = []
 from networkx.readwrite import json_graph
 
-def file_cleaner(in_file_name, out_file_name):
+def cleaner(in_file_name, out_file_name):
     not_nodes= set()
 
     raw_graph = nx.Graph()
@@ -265,6 +265,6 @@ def _create_graph(graph_file):
 
     return graph
 
-file_cleaner("map_full.geojson", "complex_graph2.json")
-graph = _create_graph("complex_graph2.json")
-visualize_degrees(graph)
+#cleaner("map_full.geojson", "complex_graph2.json")
+#graph = _create_graph("complex_graph2.json")
+#visualize_degrees(graph)

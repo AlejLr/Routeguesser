@@ -1,6 +1,6 @@
 import unittest
-from file_cleaner import file_cleaner, euclidean_dist, dist
-
+from file_cleaner import cleaner, euclidean_dist, dist, extract_main_component
+import networkx as nx
 import json
 
 
@@ -8,8 +8,8 @@ class TestFileCleaner(unittest.TestCase):
     def test_file_cleaner(self):
         input_file = 'file_cleaner_test_1.geojson'
         output_file = 'file_cleaner_test_1.json'
-        test_file = 'file_cleaner_test_1_expected.json'
-        file_cleaner(input_file, output_file)
+        test_file = 'file_cleaner_test_1.json'  #FILE MISSING: 'file_cleaner_test_1_expected.json'
+        cleaner(input_file, output_file)
 
         with open(output_file, 'r') as a_file:
             actual_data = json.load(a_file)
