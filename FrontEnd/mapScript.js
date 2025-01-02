@@ -55,7 +55,9 @@ function startNewRound() {
     // blockedEdges is an array with the start and end points of the blocked roads
     blockedEdges = [];
     for (blockedRoad of blockedRoads) {
-        blockedRoadsFeatureGroup.addLayer(L.polyline(blockedRoad, {color: '#dd0000'}));
+        if (difficulty != 100) {
+            blockedRoadsFeatureGroup.addLayer(L.polyline(blockedRoad, {color: '#dd0000'}));
+        }
         blockedEdges.push([blockedRoad[0], blockedRoad[blockedRoad.length-1]])
     }
     blockedRoadsFeatureGroup.addTo(map);
@@ -131,6 +133,9 @@ function showNeighbours() {
             if ((blockedEdge[0][0] == currentPosition[0] && blockedEdge[0][1] == currentPosition[1]) && (blockedEdge[1][0] == endPoint[0] && blockedEdge[1][1] == endPoint[1])
                 || (blockedEdge[1][0] == currentPosition[0] && blockedEdge[1][1] == currentPosition[1]) && (blockedEdge[0][0] == endPoint[0] && blockedEdge[0][1] == endPoint[1])) {
                 edgeBlocked = true
+                if (difficulty == 100) {
+                    blockedRoadsFeatureGroup.addLayer(L.polyline(subpath, {color: '#dd0000'}));
+                }
                 break
             }
         }
