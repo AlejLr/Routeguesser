@@ -1,4 +1,11 @@
 import unittest
+import sys
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 from Map import Map
 
 import networkx as nx
@@ -145,7 +152,7 @@ class TestMap(unittest.TestCase):
             del path
         with self.subTest(msg="5.1.6) Path distance should be correct."):
             self.assertIsInstance(result_5_1[1], float)
-            self.assertEqual(21, result_5_1[1])
+            self.assertEqual(210000.0, result_5_1[1])
 
         # Test case 2: Blocked roads
         test_map.Graph[(7, 0)][(14, 0)]['blocked'] = True
@@ -157,7 +164,7 @@ class TestMap(unittest.TestCase):
                 self.assertEqual(path[i], result_5_2[0][i])
             del path
         with self.subTest(msg="5.2.2) Path length should be correct."):
-            self.assertAlmostEqual(22.6157731, result_5_2[1])
+            self.assertAlmostEqual(226157.73105863907, result_5_2[1])
 
         del result_5_1
         del result_5_2

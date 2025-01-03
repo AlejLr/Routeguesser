@@ -1,5 +1,11 @@
 import unittest
 import networkx as nx
+import sys
+import os
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 from file_cleaner import file_cleaner, euclidean_dist, dist, extract_main_component
 
 import json

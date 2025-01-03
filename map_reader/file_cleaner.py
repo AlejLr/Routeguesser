@@ -265,6 +265,7 @@ def _create_graph(graph_file):
 
     return graph
 
-file_cleaner("map_full.geojson", "complex_graph2.json")
-graph = _create_graph("complex_graph2.json")
-visualize_degrees(graph)
+if __name__ == "__main__":
+    file_cleaner("map_full.geojson", "complex_graph2.json")
+    graph = _create_graph("complex_graph2.json")
+    visualize_degrees(graph)
