@@ -24,6 +24,27 @@ class TestFileCleaner(unittest.TestCase):
         del output_file
         del test_file
 
+    def test_splitter(self):
+        input_file = 'file_cleaner_test_2.geojson'
+        output_file = 'file_cleaner_test_2_actual.json'
+        test_file = 'file_cleaner_test_2_expected.json'
+        cleaner(input_file, output_file)
+
+        with open(output_file, 'r') as a_file:
+            actual_data = json.load(a_file)
+        with open(test_file, 'r') as e_file:
+            expect_data = json.load(e_file)
+
+        self.assertEqual(expect_data, actual_data)
+
+        del actual_data
+        del expect_data
+        del input_file
+        del output_file
+        del test_file
+
+
+
     def test_euclidean_dist(self):
         # Set values.
         points = ((0, 0), (1, 1))

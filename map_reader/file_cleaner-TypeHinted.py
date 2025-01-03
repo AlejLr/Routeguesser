@@ -128,7 +128,7 @@ def extract_main_component(graph: nx.Graph) -> nx.Graph:
     return nx.Graph(frozen_graph)
 
 
-def file_cleaner(in_file_name: str, out_file_name: str) -> None:
+def cleaner(in_file_name: str, out_file_name: str) -> None:
     """
     Function to clean the geojson file and write the clean data to the provided json file name.
 
@@ -138,7 +138,6 @@ def file_cleaner(in_file_name: str, out_file_name: str) -> None:
     :return (None):
     """
     # Set defaults
-    not_nodes = set()
     raw_graph = nx.Graph()
 
     try:
@@ -162,10 +161,6 @@ def file_cleaner(in_file_name: str, out_file_name: str) -> None:
             # Add the edge to the graph
             raw_graph.add_edge(road[0], road[-1], dist=dist(road), road=road,
                                 blocked=False)
-
-            # The points along the road are not actual nodes in the graph and should be removed
-            if len(road) > 3:
-                not_nodes.update(set(road[1:-1]))
 
     # Split all roads that can be split
     split: defaultdict[Corners, list[list | set]]
@@ -240,4 +235,4 @@ def joiner(graph: nx.Graph) -> bool:
 
 
 if __name__ == '__main__':
-    file_cleaner("map_full.geojson", "complex_graph2.json")
+    cleaner("map_full.geojson", "complex_graph2.json")
