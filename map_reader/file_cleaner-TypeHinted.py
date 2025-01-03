@@ -1,7 +1,7 @@
 import json
 import geojson
 import networkx as nx
-from networkx import adjacency_data
+from networkx import adjacency_data, Graph
 from collections import defaultdict
 
 '''
@@ -128,61 +128,6 @@ def extract_main_component(graph: nx.Graph) -> nx.Graph:
     return nx.Graph(frozen_graph)
 
 
-def cleaner(in_file_name: str, out_file_name: str) -> None:
-    """
-    Function to clean the geojson file and write the clean data to the provided json file name.
-
-    :param in_file_name (str): The name of the file to be cleaned.
-    :param out_file_name (str): The name of the file where the clean data should be written.
-
-    :return (None):
-    """
-    # Set defaults
-    raw_graph = nx.Graph()
-
-    try:
-        with open(in_file_name, "r") as infile:
-            # Read the file data and prepare to process it
-            gjson: geojson.FeatureCollection = geojson.load(infile)
-            gjson_objs: list[geojson.Feature] = gjson["features"]
-    except Exception as e:
-        raise e
-
-    # Begin data processing
-    obj_dict: geojson.Feature
-    for obj_dict in gjson_objs:
-        # If it is a road, save the road coordinates into a list of edges
-        if obj_dict["geometry"]["type"] == 'LineString':
-            road: Road = [(y, x) for x, y in obj_dict["geometry"]["coordinates"]]
-            # Skip circular roads
-            if road[0] == road[-1]:
-                continue
-
-            # Add the edge to the graph
-            raw_graph.add_edge(road[0], road[-1], dist=dist(road), road=road,
-                                blocked=False)
-
-    # Split all roads that can be split
-    split: defaultdict[Corners, list[list | set]]
-    while split := to_split(raw_graph):
-        splitter(raw_graph, split)  # After removing, modify to match.
-        raw_graph.remove_edges_from(split)
-        
-    # Select the most optimal graph to work with
-    main_graph: nx.Graph = extract_main_component(raw_graph)
-
-    # Join all continuous roads
-    while joiner(main_graph):
-        continue
-
-    # Save the final graph data into json dictionary format
-    new_json: dict[str, list] = adjacency_data(main_graph, attrs={'id': 'id', 'key': 'key'})
-
-    # Write to the json destination
-    with open(out_file_name, "w") as outfile:
-        json.dump(new_json, outfile)
-
-
 def joiner(graph: nx.Graph) -> bool:
     """
     Loop over all nodes in the graph and join the separated roads that do not have intersections and remove the
@@ -206,7 +151,7 @@ def joiner(graph: nx.Graph) -> bool:
         # Meets the requirements
         edge1: Corners
         edge2: Corners
-        # Get the two road corners this node is part of 
+        # Get the two road corners this node is part of
         edge1, edge2 = graph.edges(node)
         # Get the neighbouring nodes
         left: Node = edge1[-1]
@@ -225,14 +170,81 @@ def joiner(graph: nx.Graph) -> bool:
         # Merge the roads and add the result to the graph while removing the now redundant node
         new_road: Road = road_left + road_right[1:]
         graph.add_edge(new_road[0], new_road[-1], dist=dist(new_road), road=new_road,
-                        blocked=False)
+                       blocked=False)
         graph.remove_node(node)
 
         # Declare that there were modifications
         flag = True
-    
+
     return flag
+def file_cleaner(in_file_name: str, out_file_name: str) -> None:
+    """
+    Function to clean the geojson file and write the clean data to the provided json file name.
+
+    :param in_file_name (str): The name of the file to be cleaned.
+    :param out_file_name (str): The name of the file where the clean data should be written.
+
+    :return (None):
+    """
+    # Open the geojson file and create a graph object
+    raw_graph: nx.Graph = geojson_converter(in_file_name)
+
+    # Some roads are not connected to intermediate nodes. Split them into separate edges to connect them to the nodes.
+    split: defaultdict[Corners, list[list | set]]
+    while split := to_split(raw_graph):
+        splitter(raw_graph, split)  # After removing, modify to match.
+        raw_graph.remove_edges_from(split)
+        
+    # Select the most optimal graph to work with (ensure connectivity)
+    main_graph: nx.Graph = extract_main_component(raw_graph)
+
+    # Join all continuous roads that do not offer real choice to the player (remove nodes of degree 2)
+    while joiner(main_graph):
+        continue
+
+    # Save the final graph data into json dictionary format
+    new_json: dict[str, list] = adjacency_data(main_graph, attrs={'id': 'id', 'key': 'key'})
+
+    # Write to the json destination
+    with open(out_file_name, "w") as outfile:
+        json.dump(new_json, outfile)
+
+
+def geojson_converter(in_file_name: str) -> Graph:
+    """
+        Function to extract the roads stored in the geojson file and transpose them into a Graph object
+
+        :param in_file_name (str): The name of the geojson file containing the raw data.
+
+        :return (Graph): The graph containing a direct transposition of the geojson file content
+        """
+    # Initialize Graph object
+    graph = nx.Graph()
+
+    try:
+        with open(in_file_name, "r") as infile:
+            # Read the file data and prepare to process it
+            gjson: geojson.FeatureCollection = geojson.load(infile)
+            gjson_objs: list[geojson.Feature] = gjson["features"]
+    except Exception as e:
+        raise e
+
+    # Begin data processing
+    obj_dict: geojson.Feature
+    for obj_dict in gjson_objs:
+        # If it is a road, save the road coordinates into a list of edges
+        if obj_dict["geometry"]["type"] == 'LineString':
+            road: Road = [(y, x) for x, y in obj_dict["geometry"]["coordinates"]]
+            # Skip circular roads
+            if road[0] == road[-1]:
+                continue
+
+            # Add the edge to the graph
+            graph.add_edge(road[0], road[-1], dist=dist(road), road=road,
+                                blocked=False)
+
+    return graph
 
 
 if __name__ == '__main__':
-    cleaner("map_full.geojson", "complex_graph2.json")
+    file_cleaner("map_full.geojson", "complex_graph2.json")

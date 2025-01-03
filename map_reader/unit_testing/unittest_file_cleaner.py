@@ -1,5 +1,5 @@
 import unittest
-from file_cleaner import cleaner, euclidean_dist, dist, extract_main_component
+from file_cleaner import file_cleaner, euclidean_dist, dist, extract_main_component, geojson_converter
 import networkx as nx
 import json
 
@@ -9,7 +9,7 @@ class TestFileCleaner(unittest.TestCase):
         input_file = 'file_cleaner_test_1.geojson'
         output_file = 'file_cleaner_test_1_actual.json'
         test_file = 'file_cleaner_test_1_expected.json'
-        cleaner(input_file, output_file)
+        file_cleaner(input_file, output_file)
 
         with open(output_file, 'r') as a_file:
             actual_data = json.load(a_file)
@@ -28,7 +28,7 @@ class TestFileCleaner(unittest.TestCase):
         input_file = 'file_cleaner_test_2.geojson'
         output_file = 'file_cleaner_test_2_actual.json'
         test_file = 'file_cleaner_test_2_expected.json'
-        cleaner(input_file, output_file)
+        file_cleaner(input_file, output_file)
 
         with open(output_file, 'r') as a_file:
             actual_data = json.load(a_file)
