@@ -249,4 +249,4 @@ def geojson_converter(in_file_name: str) -> Graph:
 
 
 if __name__ == '__main__':
-    file_cleaner("map_full.geojson", "complex_graph2.json")
+    file_cleaner("raw_map_data.geojson", "map_graph.json")

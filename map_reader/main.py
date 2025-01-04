@@ -8,7 +8,7 @@ CORS(app)
 # when frontend sends requests with updated player position
 # the second line is added for testing purposes and not needed for the actual server
 if __name__ == "__main__":
-    game = Map("complex_graph2.json")
+    game = Map("map_graph.json")
 else:
     game = Map("map_test_5-1.json")
 
