@@ -6,7 +6,11 @@ CORS(app)
 
 # initialize the map object globally so that it can be used dynamically by the server, 
 # when frontend sends requests with updated player position
-game = Map("complex_graph2.json")
+# the second line is added for testing purposes and not needed for the actual server
+if __name__ == "__main__":
+    game = Map("complex_graph2.json")
+else:
+    game = Map("map_test_5-1.json")
 
 def send_start(data: dict) -> dict:
     """

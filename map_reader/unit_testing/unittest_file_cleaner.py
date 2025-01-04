@@ -1,4 +1,11 @@
 import unittest
+import os 
+import sys
+
+# Add the map_reader directory path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+
 from file_cleaner import file_cleaner, euclidean_dist, dist, extract_main_component, geojson_converter
 import networkx as nx
 import json
