@@ -26,7 +26,7 @@ class TestMap(unittest.TestCase):
         # Define results
         result_1_1 = Map._create_graph("map_test_1-1.json")
         result_1_2 = Map._create_graph("map_test_1-2.json")
-        result_1_3 = Map._create_graph("map_test_1-3.txt", default_file="map_test_1-1.json")
+
 
 
         # Test case 1: Basic usability
@@ -51,12 +51,13 @@ class TestMap(unittest.TestCase):
 
         # Test case 3: Invalid input file (go to default complex_json)
         with self.subTest(msg="1.3.1) Should return a networkx graph"):
-            self.assertIsInstance(Map._create_graph("map_test_1-1.json"), nx.Graph)
+            with self.assertRaises(ValueError) as context:
+                Map._create_graph("map_test_1-3.txt")
+
 
 
         del result_1_1
         del result_1_2
-        del result_1_3
 
     '''
     Tests the function to find a list of nodes that can be removed together while maintaining

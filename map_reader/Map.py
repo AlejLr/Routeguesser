@@ -108,7 +108,7 @@ class Map:
         """
         # Very basic error handling
         if not graph_file.endswith('.json'):
-            raise TypeError("The file is not a json file")
+            raise ValueError("The file is not a json file")
 
         # Data collection and sorting
         with open(graph_file) as f:
