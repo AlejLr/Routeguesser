@@ -214,6 +214,7 @@ async function requestNeighbours(coords) {
 
 // Rest of the functions
 
+// This function loads new data and starts a new round
 async function initializeGame(){
     try{
         distance = 0;
@@ -223,7 +224,6 @@ async function initializeGame(){
         console.log("Data received");
         loadData(data);
         startNewRound();
-        // test();
     }
     catch(error){
         console.error("Error initializing:", error);
@@ -248,6 +248,7 @@ function setDifficultyHard() {
     initializeGame();
 }
 
+// This function resets the current round. It resets the distance, clears the map and restarts the current round.
 function resetGame() {
     console.log("Resetting")
 
@@ -258,6 +259,8 @@ function resetGame() {
     startNewRound();
 }
 
+// This function obtains the value that the user wrote on the box for the number or rountes and
+// If the user wrote nothing or an invalid number, it sets 3 as the default
 function updateRoutesNum() {
     const value = parseInt(routeNumber.value);
 
@@ -274,12 +277,14 @@ function hideStartScreen() {
     menu.style.display = "block";
 }
 
+// Add addition to the current distance traversed for this round. Update the counter shown in the UI
 function updateDistance(addition) {
     console.log(addition, typeof(addition))
     distance += parseFloat(addition);
     scoreText.innerHTML = Math.round(distance).toString();
 }
 
+// This function updatse the cumulative distance and optimal distance across all rounds and calls to show a bar displaying how well the user did compared to the optimal distance
 function endRound() {
     finalDistance += distance;
     finalOptimalDistance += optimalDistance;
@@ -288,11 +293,11 @@ function endRound() {
         return;
     }
 
-    // const percentage = Math.min(100, Math.round(100*(optimalDistance/distance))); // I'm not sure if the score should be capped at 100, but anyways, it's better left uncapped for debugging
     percentage = Math.round(100*(optimalDistance/distance));
     showBar(percentage, "progress");
 }
 
+// This function shows a bar with a percentage. The particular bar to show is passed as an argument
 function showBar(percentage, bar) {
     barContainer = document.getElementById(bar+"BarContainer");
     barFill = document.getElementById(bar+"Fill");
@@ -320,18 +325,17 @@ function showBar(percentage, bar) {
 
 function nextRound() {
     console.log("Going into next round");
-    // I cannot add the start from the end point since the functionality doesnt exist on the backend
     barContainer.style.display = "none";
     currentRound++;
+    // If it's the final round, show a bar with the final performance
     if (currentRound === routesNum) {
         percentage = Math.round(100*(finalOptimalDistance/finalDistance));
         showBar(percentage,"final");
     }
+    // Otherwise, clear the map and initialise the game again for a new round
     else{
         clearMap();
         initializeGame();
-        // clearMap();
-        // startNewRound(true);
     }
 }
 
