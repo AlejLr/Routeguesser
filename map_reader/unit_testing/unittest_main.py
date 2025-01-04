@@ -7,7 +7,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 import unittest
 from map_reader.main import send_start, send_neighbours
-from Map import Map
 
 
 class TestMain(unittest.TestCase):
