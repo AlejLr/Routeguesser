@@ -1,0 +1,15 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": [],
+  "nodes": [
+    {"id": [2, 4]},
+    {"id": [6, 4]},
+    {"id": [4, 4]}
+  ],
+  "adjacency": [
+    [
+      {"dist": 4.0, "road": [[2, 4], [4, 4], [6, 4]], "blocked": false, "id": [6, 4]}
+    ]
+  ]
+}

@@ -1,270 +1,250 @@
-
-#This file takes the original geojson file and return a simpler json that contains only the relevant data to construct
-#an undirected graph with NetworkX
-
-#This code is a one-time function
-
-"""This file take the original geojson, keeps only one connected componento of the original graph and create
-an adjacency list accepted by networkx"""
-
-"""TO DO
-    0- Eliminate circular edges
-    1- If nodes do not lead to a crossing, inglobate them into streets
-    2- If the end graph has roads that overlap/remain in the proximity without connecting, connect them
-    3- True death ends must be eliminated
-    4- Remove double roads
-    5- Add components that are actually usefull for the map completeness
-    
-
-
-"""
 import json
 import geojson
 import networkx as nx
-from networkx import adjacency_data
-from networkx import adjacency_graph
-import matplotlib.pyplot as plt
+from networkx import adjacency_data, Graph
 from collections import defaultdict
-from decimal import Decimal
+
+'''
+This file should serve the one-time function of cleaning a geojson file and creating a new json file that can be used
+in the main program.
+The relevant data we want to keep in the json file will be necessary for creating the NetworkX graph and nothing else.
+'''
+
+# Used in type hints to improve readability.
+Node = tuple[float, float]
+Road = list[Node]
+Corners = tuple[Node, Node]
 
 
-new_json = []
-from networkx.readwrite import json_graph
+def euclidean_dist(node1: Node, node2: Node) -> float:
+    """
+    Calculate the Euclidean distance between two points.
 
-def file_cleaner(in_file_name, out_file_name):
-    not_nodes= set()
+    :param node1 (Node): The first node coordinates.
+    :param node2 (Node): The second node coordinates.
 
-    raw_graph = nx.Graph()
-    with open(in_file_name, "r") as infile:
-        gjson = geojson.load(infile)
-        gjson_objs = gjson["features"]
-        for obj_dict in gjson_objs:
-            if obj_dict["geometry"]["type"] == 'LineString':
-                road = [(y, x) for x, y in obj_dict["geometry"]["coordinates"]]
-                # skip circular roads
-                if road[0] == road[-1]:
-                    continue
-                raw_graph.add_edge(road[0], road[-1], dist=dist(road), road=road,
-                                   blocked=False)
-                if len(road) > 3:
-                    trimmed_road = road[1:-1]
-                    not_nodes.update(set(trimmed_road))
+    :return (float): The distance between both nodes.
+    """
+    return ((node1[0] - node2[0]) ** 2 + (node1[1] - node2[1]) ** 2) ** 0.5
 
 
+def dist(points: Road) -> float:
+    """
+    Calculates the length of a road by calculating the euclidean distance between the points along the road.
+
+    :param points (Road): The node points along the road.
+
+    :return (float): The distance to travel if the road is taken.
+    """
+    return sum(euclidean_dist(points[i], points[i + 1]) for i in range(len(points) - 1))
 
 
+def to_split(graph: nx.Graph) -> defaultdict[Corners, list[Road | set]]:
+    """
+    Identify points where there is a node on the road and split the road into two parts to accurately reflect that.
 
-    # Values used just for testing purposes
+    :param graph (nx.Graph): The graph containing the nodes and edges that should be modified.
 
-    global edges_to_join
-    global edges_to_split
-    global splitted_edges
+    :return (dict): Dictionary of edges to split with keys being edge corners and values being the road and nodes on it.
+    """
+    split: defaultdict[Corners, list[Road | set]] = defaultdict(lambda: [list(), set()])
 
-    for n in range(4):
-        edges_to_split = to_split(raw_graph)
-        splitted_edges = splitter(raw_graph,edges_to_split)
-        raw_graph.remove_edges_from(edges_to_split)
+    node1: Node
+    node2: Node
+    data: dict[str, float | Road | bool]
+    # Get the start, end, and road of all edges
+    for node1, node2, data in graph.edges(data=True):
+        road: Road = data.get('road', [])
+        # Skip roads that do not have intermediate points
+        if len(road) < 3:
+            continue
 
-    main_graph = extract_main_component(raw_graph)
+        # Save the nodes that split the road
+        node: Node
+        for node in road[1:-1]:
+            if node in graph.nodes:
+                split[(node1, node2)][0] = road  # Assumes it is unique.
+                split[(node1, node2)][1].add(node)
 
-    edges_to_join = to_join(main_graph)
-
-    for n in range(3):
-        joiner(main_graph)
+    return split
 
 
-    final_graph = extract_main_component(main_graph)
+def splitter(graph: nx.Graph, split: defaultdict[Corners, list[list | set]]) -> list[list[Road]]:
+    """
+    Split the edges identified in the to_split function into new edges and add the splitting point to the nodes.
+
+    :param graph (nx.Graph): The graph that contains the nodes and edges to be modified.
+    :param split (dict): The dictionary of edges (Roads) to be split as well as the point (Node) to split at.
+
+    :return (list): A list of all newly added roads made by splitting existing edges.
+    """
+    already_split: list[list[Road]] = []
+
+    # Go over each edge in the graph that needs to be split
+    edge: Corners
+    for edge in split:
+        # Set basic variables
+        new_roads: list[Road] = []  # All the new added roads.
+        left: Road = []  # The remainder of the original road after splitting.
+        road: Road = split[edge][0]  # The original road.
+        nodes: set[Node] = split[edge][1]  # The set of nodes that indicate when to cut.
+
+        # Go over the road, and cut it where necessary, adding the relevant data to the saving variables
+        ind: int
+        point: Node
+        for ind, point in enumerate(road):
+            if point in nodes:
+                new_roads.append(road[:ind + 1])
+                left = road[ind:]
+
+        # If a road was cut, save the original remaining bit
+        if left:
+            new_roads.append(left)
+
+        # Add the new roads to the graph
+        new_road: Road
+        for new_road in new_roads:
+            graph.add_edge(new_road[0], new_road[-1], dist=dist(new_road), road=new_road, blocked=False)
+
+        # Save the new roads
+        already_split.append(new_roads)
+
+    return already_split
 
 
-    new_json = adjacency_data(final_graph, attrs={'id': 'id', 'key': 'key'})
+def extract_main_component(graph: nx.Graph) -> nx.Graph:
+    """
+    Deep copies the largest connected subgraph from the provided full graph.
 
+    :param graph (nx.Graph): The original full graph which can be a forest.
+
+    :return (nx.Graph): The main segment which can be the fullest tree.
+    """
+    # Sort the components by number of connected nodes
+    all_connected_components: list = sorted(nx.connected_components(graph), key=len, reverse=True)
+    # Select the largest component, this is shared with the original graph
+    frozen_graph: nx.Graph = graph.subgraph(all_connected_components[0])
+    # Return an independent deep copy of the largest component
+    return nx.Graph(frozen_graph)
+
+
+def joiner(graph: nx.Graph) -> bool:
+    """
+    Loop over all nodes in the graph and join the separated roads that do not have intersections and remove the
+    intermediate node. (L-turns are not valid player positions as they offer no value)
+
+    :param graph: Original graph containing all nodes and roads.
+
+    :return (bool): Whether roads have been merged
+    """
+    # Determine if a new loop might be necessary
+    flag: bool = False
+
+    # Loop over all nodes while getting their degrees
+    for node, degree in dict(graph.degree).items():
+        # Skip nodes that don't satisfy the basic conditions
+        if degree != 2:
+            continue
+        if len(graph.edges(node)) != 2:
+            continue
+
+        # Meets the requirements
+        edge1: Corners
+        edge2: Corners
+        # Get the two road corners this node is part of
+        edge1, edge2 = graph.edges(node)
+        # Get the neighbouring nodes
+        left: Node = edge1[-1]
+        right: Node = edge2[-1]
+
+        # Get the road to the neighbouring nodes
+        road_left: Road = graph.get_edge_data(node, left, default={}).get('road', [])
+        road_right: Road = graph.get_edge_data(node, right, default={}).get('road', [])
+
+        # Orient the roads correctly
+        if road_left[0] == node:
+            road_left.reverse()
+        if road_right[-1] == node:
+            road_right.reverse()
+
+        # Merge the roads and add the result to the graph while removing the now redundant node
+        new_road: Road = road_left + road_right[1:]
+        graph.add_edge(new_road[0], new_road[-1], dist=dist(new_road), road=new_road,
+                       blocked=False)
+        graph.remove_node(node)
+
+        # Declare that there were modifications
+        flag = True
+
+    return flag
+def file_cleaner(in_file_name: str, out_file_name: str) -> None:
+    """
+    Function to clean the geojson file and write the clean data to the provided json file name.
+
+    :param in_file_name (str): The name of the file to be cleaned.
+    :param out_file_name (str): The name of the file where the clean data should be written.
+
+    :return (None):
+    """
+    # Open the geojson file and create a graph object
+    raw_graph: nx.Graph = geojson_converter(in_file_name)
+
+    # Some roads are not connected to intermediate nodes. Split them into separate edges to connect them to the nodes.
+    split: defaultdict[Corners, list[list | set]]
+    while split := to_split(raw_graph):
+        splitter(raw_graph, split)  # After removing, modify to match.
+        raw_graph.remove_edges_from(split)
+        
+    # Select the most optimal graph to work with (ensure connectivity)
+    main_graph: nx.Graph = extract_main_component(raw_graph)
+
+    # Join all continuous roads that do not offer real choice to the player (remove nodes of degree 2)
+    while joiner(main_graph):
+        continue
+
+    # Save the final graph data into json dictionary format
+    new_json: dict[str, list] = adjacency_data(main_graph, attrs={'id': 'id', 'key': 'key'})
+
+    # Write to the json destination
     with open(out_file_name, "w") as outfile:
         json.dump(new_json, outfile)
 
 
-def extract_main_component(graph):
-    all_connected_components = sorted(nx.connected_components(graph), key=len, reverse=True)
-    frozen_graph = graph.subgraph(all_connected_components[0])
-    return nx.Graph(frozen_graph)
-
-def to_split(graph):
+def geojson_converter(in_file_name: str) -> Graph:
     """
-    There are some nodes than, even if they overlap with roads, are not connected to them
-    Identify the roads where this happens and split them accordingly, creating new sub roads
-    """
-    old_roads = set()
-    new_roads = []
-    found = set()
+        Function to extract the roads stored in the geojson file and transpose them into a Graph object
 
-    edges_to_split = defaultdict(lambda: [list(),set()])
+        :param in_file_name (str): The name of the geojson file containing the raw data.
 
+        :return (Graph): The graph containing a direct transposition of the geojson file content
+        """
+    # Initialize Graph object
+    graph = nx.Graph()
 
-    for n1, n2, data in graph.edges(data=True):
-        road = data.get('road', [])
-        if len(road)<3:
-            continue
-        else:
-            trimmed_road = road[1:-1]
-            for node in graph.nodes:
-                if node in trimmed_road:
-                    edges_to_split[(n1,n2)][0] = road
-                    edges_to_split[(n1,n2)][1].add(node)
+    try:
+        with open(in_file_name, "r") as infile:
+            # Read the file data and prepare to process it
+            gjson: geojson.FeatureCollection = geojson.load(infile)
+            gjson_objs: list[geojson.Feature] = gjson["features"]
+    except Exception as e:
+        raise e
 
-    return edges_to_split
+    # Begin data processing
+    obj_dict: geojson.Feature
+    for obj_dict in gjson_objs:
+        # If it is a road, save the road coordinates into a list of edges
+        if obj_dict["geometry"]["type"] == 'LineString':
+            road: Road = [(y, x) for x, y in obj_dict["geometry"]["coordinates"]]
+            # Skip circular roads
+            if road[0] == road[-1]:
+                continue
 
-def splitter(graph, edges_to_split):
-
-    splitted_edges = []
-
-    for edge in edges_to_split:
-
-        new_roads = []
-        left = []
-
-        road = edges_to_split[edge][0]
-        nodes = edges_to_split[edge][1]
-
-        for ind, point in enumerate(road):
-             if point in nodes:
-                 new_roads.append(road[:ind+1])
-                 left = road[ind:]
-
-        if left:
-            new_roads.append(left)
-
-        splitted_edges.append(new_roads)
-
-        for new_road in new_roads:
-            graph.add_edge(new_road[0], new_road[-1], dist=dist(new_road), road=new_road,
-                                        blocked=False)
-
-    return splitted_edges
-
-
-
-def to_join(graph):
-    edges_to_join = []
-    pairs = defaultdict(lambda : dict)
-    for node, degree in dict(graph.degree).items():
-
-        if degree == 2:
-            edges_to_join.extend(graph.edges(node))
-            pairs[node] = list(graph.edges(node))
-    return edges_to_join
-
-
-def joiner(graph):
-
-    for node, degree in dict(graph.degree).items():
-        if degree == 2:
-            if len(graph.edges(node)) == 2:
-                edge1, edge2 = graph.edges(node)
-                left = edge1[-1]
-                right = edge2[-1]
-
-                road_left = graph.get_edge_data(node, left, default={}).get('road', [])
-                road_right = graph.get_edge_data(node, right, default={}).get('road', [])
-                if road_left[0] == node:
-                    road_left.reverse()
-                if road_right[-1] == node:
-                    road_right.reverse()
-                new_road = road_left + road_right[1:]
-                graph.add_edge(new_road[0], new_road[-1], dist=dist(new_road), road=new_road,
-                               blocked=False)
-                graph.remove_node(node)
-
-def euclidean_dist(node1, node2):
-
-    return float((Decimal(node1[0] - node2[0]) ** Decimal(2) + Decimal(node1[1] - node2[1]) ** Decimal(2)) ** Decimal(0.5))
-def dist(points):
-    return sum(euclidean_dist(points[i], points[i + 1]) for i in range(len(points) - 1))
-
-
-
-
-
-# TESTING
-import itertools
-def visualize_connected_components(graph):
-    colors = itertools.cycle(['red', 'green', 'violet', 'orange', 'yellow'])
-    pos = {node: node for node in graph.nodes()}  # Use node coordinates as positions
-
-    plt.figure(figsize=(10, 10))
-    for component in nx.connected_components(graph):
-        color = next(colors)
-        subgraph = graph.subgraph(component)
-        nx.draw(subgraph, pos, edge_color=color, node_color=color, with_labels=False, node_size=10)
-
-    plt.show()
-
-def visualize_degrees(graph):
-    # Compute the degree of each node
-    dead_end = 0
-
-    pos = {node: node for node in graph.nodes()}
-    degrees = dict(graph.degree())
-
-    node_color_map = []
-    for node, degree in degrees.items():
-        if degree == 0:
-            node_color_map.append('black')
-        elif degree == 1:
-            dead_end += 1
-            node_color_map.append('red')
-        elif degree == 2:
-            node_color_map.append('orange')
-        elif degree > 12:
-            node_color_map.append('violet')
-            print(node)
-        else:
-            node_color_map.append('green')
-
-    splitting = []
-    for edge in graph.edges:
-        n1, n2 = edge
-        if (n1 , n2) in edges_to_join or (n2 , n1) in edges_to_join:
-            # Not symmetric !!!!
-
-            splitting.append('violet')
-        elif edge in edges_to_split:
-            splitting.append('blue')
-        elif edge in splitted_edges:
-            splitting.append('red')
-        else:
-            splitting.append('black')
-
-    # Plot the graph
-    plt.figure(figsize=(10, 10))
-    nx.draw(
-        graph,
-        pos,
-        with_labels=False,
-        node_color=node_color_map,
-        edge_color= splitting,  # Specify edge colors
-        node_size=10,
-    )
-
-    plt.show()
-
-
-
-def _create_graph(graph_file):
-    # NetworkX fills in the nodes
-    # ROADS are lists of lists, but this can be changed in the future
-
-    data = json.load(open(graph_file))
-
-    #Tuples are not native json data types
-    for node in data["nodes"]:
-        node["id"] = tuple(node["id"])
-    for adj_list in data["adjacency"]:
-        for edge in adj_list:
-            edge["id"] = tuple(edge["id"])
-
-    graph = adjacency_graph(data, directed=False, multigraph=False, attrs={'id': 'id', 'key': 'key'})
+            # Add the edge to the graph
+            graph.add_edge(road[0], road[-1], dist=dist(road), road=road,
+                                blocked=False)
 
     return graph
 
-file_cleaner("map_full.geojson", "complex_graph2.json")
-graph = _create_graph("complex_graph2.json")
-visualize_degrees(graph)
+
+if __name__ == '__main__':
+    file_cleaner("map_full.geojson", "complex_graph2.json")
