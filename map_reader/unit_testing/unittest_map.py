@@ -26,6 +26,8 @@ class TestMap(unittest.TestCase):
         # Define results
         result_1_1 = Map._create_graph("map_test_1-1.json")
         result_1_2 = Map._create_graph("map_test_1-2.json")
+        result_1_3 = Map._create_graph("map_test_1-3.txt", default_file="map_test_1-1.json")
+
 
         # Test case 1: Basic usability
         with self.subTest(msg="1.1.1) Should return a networkx graph object."):
@@ -47,8 +49,14 @@ class TestMap(unittest.TestCase):
         with self.subTest(msg="1.2.4) Should return correct number of edges."):
             self.assertEqual(3, result_1_2.number_of_edges())
 
+        # Test case 3: Invalid input file (go to default complex_json)
+        with self.subTest(msg="1.3.1) Should return a networkx graph"):
+            self.assertIsInstance(Map._create_graph("map_test_1-1.json"), nx.Graph)
+
+
         del result_1_1
         del result_1_2
+        del result_1_3
 
     '''
     Tests the function to find a list of nodes that can be removed together while maintaining
@@ -63,6 +71,7 @@ class TestMap(unittest.TestCase):
         test_map = Map('map_test_1-1.json')
         result_2_2 = test_map.generate_blocked_roads(2)
 
+
         # Test case 1: Fully connected graph
         with self.subTest(msg="2.1.1) Should return a list."):
             self.assertIsInstance(result_2_1, list)
@@ -76,6 +85,9 @@ class TestMap(unittest.TestCase):
             self.assertIsInstance(result_2_2, list)
         with self.subTest(msg="2.2.2) Should be an empty."):
             self.assertEqual(0, len(result_2_2))
+
+
+
 
         del result_2_1
         del result_2_2
@@ -102,8 +114,10 @@ class TestMap(unittest.TestCase):
     '''
     def test_generate_start_end(self):
         # Define results
-        test_map = Map("map_test_1-2.json")
-        result_4_1 = test_map.generate_start_end()
+        test_map_4_1 = Map("map_test_1-2.json")
+        result_4_1 = test_map_4_1.generate_start_end()
+        test_map_4_2 = Map("map_test_4-2.json")
+
 
         # Test case 1: Check if it works
         with self.subTest(msg="4.1.1) Should return a tuple of results."):
@@ -115,8 +129,20 @@ class TestMap(unittest.TestCase):
         with self.subTest(msg="4.1.4) Each of the results should be a coordinate."):
             self.assertTrue(all(len(x) == 2 for x in result_4_1))
 
+        # Test case 1: test error handling
+        with self.subTest(msg="4.2.1) Not enough nodes to generate start and end."):
+            with self.assertRaises(Exception) as context:
+                test_map_4_2.generate_start_end()
+            self.assertEqual(str(context.exception), "Map does not have enough nodes to generate a starting and ending point.")
+        with self.subTest(msg="4.2.1) Not enough nodes."):
+            with self.assertRaises(Exception) as context:
+                test_map_4_1.generate_start_end(min_distance=-5)
+            self.assertEqual(str(context.exception), "Cannot have negative distance.")
+
+
         del result_4_1
-        del test_map
+        del test_map_4_1
+        del test_map_4_2
 
     '''
     Tests the astar algorithm, and as a result of immediately returning optimal path function, tests the output of that
@@ -166,6 +192,7 @@ class TestMap(unittest.TestCase):
         with self.subTest(msg="5.2.2) Path length should be correct."):
             self.assertAlmostEqual(226157.73105863907, result_5_2[1])
 
+
         del result_5_1
         del result_5_2
         del test_map
@@ -195,6 +222,8 @@ class TestMap(unittest.TestCase):
             self.assertTrue(all(isinstance(x, float | int) for x in result_6[0][1][0]))
         with self.subTest(msg="6.1.5) Third element should be a float."):
             self.assertIsInstance(result_6[0][2], float)
+
+
 
         del result_6
         del test_map

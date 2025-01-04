@@ -1,13 +1,13 @@
 import unittest
-import networkx as nx
+import os 
 import sys
-import os
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-sys.path.append(parent_dir)
 
-from file_cleaner import file_cleaner, euclidean_dist, dist, extract_main_component
+# Add the map_reader directory path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+
+from file_cleaner import file_cleaner, euclidean_dist, dist, extract_main_component, geojson_converter
+import networkx as nx
 import json
 
 
@@ -31,6 +31,27 @@ class TestFileCleaner(unittest.TestCase):
         del output_file
         del test_file
 
+    def test_splitter(self):
+        input_file = 'file_cleaner_test_2.geojson'
+        output_file = 'file_cleaner_test_2_actual.json'
+        test_file = 'file_cleaner_test_2_expected.json'
+        file_cleaner(input_file, output_file)
+
+        with open(output_file, 'r') as a_file:
+            actual_data = json.load(a_file)
+        with open(test_file, 'r') as e_file:
+            expect_data = json.load(e_file)
+
+        self.assertEqual(expect_data, actual_data)
+
+        del actual_data
+        del expect_data
+        del input_file
+        del output_file
+        del test_file
+
+
+
     def test_euclidean_dist(self):
         # Set values.
         points = ((0, 0), (1, 1))
@@ -42,6 +63,8 @@ class TestFileCleaner(unittest.TestCase):
             self.assertIsInstance(test_euclidean_dist, float)
         with self.subTest(msg="2.2) Should return correct value."):
             self.assertEqual(actual_euclidean_dist, test_euclidean_dist)
+        # with self.subTest(msg="2.3) Should check for invalid input."):  # TO-DO
+        #     pass
 
         # Clean up.
         del points

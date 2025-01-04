@@ -41,10 +41,9 @@ class Map:
         """
         # Base and unchanging object variables
         self.serial: int = random.randint(0, 200)
-        try:
-            self.Graph: nx.Graph = Map._create_graph(graph_file)
-        except Exception as e:
-            raise e
+
+        self.Graph: nx.Graph = Map._create_graph(graph_file)
+
 
         # Values declared and reset in the game initiation
         self.number_of_blocked_roads: int = -1
@@ -99,23 +98,25 @@ class Map:
         self.optimal_path, self.optimal_distance = self.astar()
 
     @staticmethod
-    def _create_graph(graph_file: str) -> nx.Graph:
+    def _create_graph(graph_file: str, default_file: str = 'complex_graph.json') -> nx.Graph:
         """
         A static method that creates a connected graph used in the Map object by reading a cleaned json file.
 
         :param graph_file (str): The name/directory of the cleaned json file containing the graph info.
+
+        :param default_file (str): The name/directory of a default json file for error handling.
 
         :return (nx.Graph): The NetworkX Graph created.
         """
         # Very basic error handling
         if not graph_file.endswith('.json'):
             print("The file is not a json file, attempting to read default.")
-            graph_file = 'complex_graph.json'
+            graph_file = default_file
         if not fpath.isfile(graph_file):
-            if graph_file == 'complex_graph.json':
+            if graph_file == default_file:
                 raise IOError("The default json file does not exist in current directory.")
             print("The file does not exist in the directory, attempting to read default.")
-            graph_file = 'complex_graph.json'
+            graph_file = default_file
 
         # Data collection and sorting
         with open(graph_file) as f:
