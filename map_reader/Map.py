@@ -24,7 +24,6 @@ class Map:
     :attr score (int): Current score.
     :attr start (Node): Starting position of current round.
     :attr end (Node): Ending position of current round.
-    :attr current_pos (Node): Current player position.
     :attr optimal_path (Road): Most optimal path from current round starting position to ending position according to A*.
     :attr optimal_distance (float): Distance from the starting position to the ending position using optimal path.
     :attr history (dict[Node, tuple[Node, float]]): Used in the A* algorithm to find optimal path.
@@ -51,7 +50,6 @@ class Map:
         self.score: int = -1
         self.start: Node = (-1, -1)
         self.end: Node = (-1, -1)
-        self.current_pos: Node = self.start
         self.optimal_path: Road = []
         self.optimal_distance: float = -1
 
@@ -78,7 +76,6 @@ class Map:
 
         # Reset the player and goal to random locations
         self.start, self.end = self.generate_start_end()
-        self.current_pos = self.start
 
         # Find optimal solution to new game
         self.optimal_path, self.optimal_distance = self.astar()
@@ -326,18 +323,6 @@ class Map:
 
         return neighbour_and_roads
 
-    def process_inputs(self, next_node: Node) -> None:
-        """
-        Changes the current player node position based on input received from the main module.
-
-        :param next_node (Node): Coordinates of the next node.
-
-        :return (None):
-        """
-        if next_node not in self.Graph:
-            print("The node is not in the graph")
-            return None
-        self.current_pos = next_node
 
     @staticmethod
     def calculate_cartesian_distance(node1: Node, node2: Node) -> float:
@@ -357,7 +342,7 @@ class Map:
 
         :return (str): The basic information of current instance.
         """
-        return (f"Current: {self.current_pos}, Start: {self.start}, End:{self.end}, "
+        return (f"Start: {self.start}, End:{self.end}, "
                 f"number of blocked roads:{self.number_of_blocked_roads}")
 
     @staticmethod

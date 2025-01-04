@@ -22,7 +22,7 @@ def send_start(data: dict) -> dict:
     return jsonify({"start" : game.start, 
                     "end" : game.end, 
                     "blocked nodes": game.blocked_roads, 
-                    "neighbours": game.get_neighbours_and_roads(game.current_pos), 
+                    "neighbours": game.get_neighbours_and_roads(game.start),
                     "optimal path" :  game.optimal_path, 
                     "optimal distance" : game.optimal_distance})
 
