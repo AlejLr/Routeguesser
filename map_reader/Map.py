@@ -83,20 +83,6 @@ class Map:
         # Find optimal solution to new game
         self.optimal_path, self.optimal_distance = self.astar()
 
-    def new_round(self) -> None:
-        """
-        Reset part of the game scenario to continue in the same game as a new round.
-
-        :return (None):
-        """
-        # Set the new starting and goal locations
-        self.start = self.end
-        self.end = self.generate_end()
-        self.current_pos = self.start
-
-        # Find optimal solution to new round
-        self.optimal_path, self.optimal_distance = self.astar()
-
     @staticmethod
     def _create_graph(graph_file: str) -> nx.Graph:
         """
@@ -205,32 +191,6 @@ class Map:
             # Valid node pair is found, return it
             if self.calculate_cartesian_distance(start, end) * theta >= min_distance-i:
                 return start, end
-
-        raise Exception("An unknown error has occurred.")
-
-    def generate_end(self, min_distance: int = 100, theta: int = 1000) -> Node:
-        """
-        Generates a random end node, it is returned when it matches the minimum distance requirement which decreases
-        with each iteration to prevent an infinite loop.
-
-        :param min_distance (int): The preferred minimum distance between current player position and end goal.
-        :param theta (int): The accuracy of the distance from the start to the new end.
-
-        :return (Node): A random end node.
-        """
-        # Get nodes list
-        nodes: list[Node] = list(self.Graph.nodes)
-        if len(nodes) < 2:
-            raise Exception("Map does not have enough nodes to generate a starting and ending point.")
-        if min_distance < 0:
-            raise Exception("Cannot have negative distance.")
-
-        # Decrease minimum distance until valid pair is found or minimum distance is 0
-        for i in range(min_distance+1):
-            end: Node = random.choice(nodes)
-            # Valid end point is found, return it
-            if self.calculate_cartesian_distance(self.start, end) * theta >= min_distance:
-                return end
 
         raise Exception("An unknown error has occurred.")
 
