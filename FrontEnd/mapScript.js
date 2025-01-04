@@ -55,7 +55,9 @@ function startNewRound() {
     // blockedEdges is an array with the start and end points of the blocked roads
     blockedEdges = [];
     for (blockedRoad of blockedRoads) {
-        blockedRoadsFeatureGroup.addLayer(L.polyline(blockedRoad, {color: '#dd0000'}));
+        if (difficulty != 100) {
+            blockedRoadsFeatureGroup.addLayer(L.polyline(blockedRoad, {color: '#dd0000'}));
+        }
         blockedEdges.push([blockedRoad[0], blockedRoad[blockedRoad.length-1]])
     }
     blockedRoadsFeatureGroup.addTo(map);
@@ -69,7 +71,7 @@ function startNewRound() {
 
     pathLine = L.polyline(detailedPath, {color: '#2e80d1'}).addTo(map);
     currentPosition = start;
-    showNeighbours(path, detailedPath);
+    requestNeighbours(start);
     // console.log(startMarker.getLatLng(), endMarker.getLatLng());
     map.fitBounds([startMarker.getLatLng(), endMarker.getLatLng()], {padding: [0.4, 0.4]});
 }
@@ -124,13 +126,16 @@ function showNeighbours() {
         let endPoint = trio[0],
         subpath = trio[1],
         distance = trio[2];
-        // console.log("edge:",[currentPosition, endPoint]);
+        console.log("edge:",[currentPosition, endPoint], "distance:", distance);
 
         let edgeBlocked = false
         for (blockedEdge of blockedEdges) {
             if ((blockedEdge[0][0] == currentPosition[0] && blockedEdge[0][1] == currentPosition[1]) && (blockedEdge[1][0] == endPoint[0] && blockedEdge[1][1] == endPoint[1])
                 || (blockedEdge[1][0] == currentPosition[0] && blockedEdge[1][1] == currentPosition[1]) && (blockedEdge[0][0] == endPoint[0] && blockedEdge[0][1] == endPoint[1])) {
                 edgeBlocked = true
+                if (difficulty == 100) {
+                    blockedRoadsFeatureGroup.addLayer(L.polyline(subpath, {color: '#dd0000'}));
+                }
                 break
             }
         }
