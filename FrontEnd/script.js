@@ -2,7 +2,6 @@
 
 
 // All the constants for the anumation elements
-const g9 = document.getElementById('g9');
 const logo = document.getElementById('logo');
 const presents = document.getElementById('presents');
 const title = document.getElementById('title');
@@ -17,7 +16,7 @@ const gameExplanation = document.querySelector('#gameExplanation');
 // When the page is loaded, an event listener is triggered
 // The elements get hidden and the start animation begins
 document.addEventListener('DOMContentLoaded', () => {
-    const elements = [g9, logo, presents, title, subtitle, startGame];
+    const elements = [ logo, presents, title, subtitle, startGame];
     elements.forEach(element => {
         if (element) {
             element.classList.add('hidden');
@@ -89,21 +88,14 @@ function runAnimations() {
     // All the elements are shown and hidden one by one using a timeout
     // The final state of the animation is reached by calling the finishAnimation function
 
-    showElement(g9);
-
-    setTimeout(() => {
-        hideElement(g9);
-        setTimeout(() => {
-            showElement(logo);
-        }, 1000);
-    }, 2000);
+    showElement(logo);
 
     setTimeout(() => {
         hideElement(logo);
         setTimeout(() => {
             showElement(presents);
         }, 1000);
-    }, 4000);
+    }, 3000);
 
     setTimeout(() => {
         hideElement(presents);
@@ -114,7 +106,7 @@ function runAnimations() {
                 addStartGameEventListener();
             }, 2000);
         }, 1000);
-    }, 6000);
+    }, 5000);
 }
 
 
