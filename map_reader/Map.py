@@ -98,25 +98,17 @@ class Map:
         self.optimal_path, self.optimal_distance = self.astar()
 
     @staticmethod
-    def _create_graph(graph_file: str, default_file: str = 'map_graph.json') -> nx.Graph:
+    def _create_graph(graph_file: str) -> nx.Graph:
         """
         A static method that creates a connected graph used in the Map object by reading a cleaned json file.
 
         :param graph_file (str): The name/directory of the cleaned json file containing the graph info.
 
-        :param default_file (str): The name/directory of a default json file for error handling.
-
         :return (nx.Graph): The NetworkX Graph created.
         """
         # Very basic error handling
         if not graph_file.endswith('.json'):
-            print("The file is not a json file, attempting to read default.")
-            graph_file = default_file
-        if not fpath.isfile(graph_file):
-            if graph_file == default_file:
-                raise IOError("The default json file does not exist in current directory.")
-            print("The file does not exist in the directory, attempting to read default.")
-            graph_file = default_file
+            raise TypeError("The file is not a json file")
 
         # Data collection and sorting
         with open(graph_file) as f:
