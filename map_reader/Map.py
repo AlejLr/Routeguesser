@@ -98,7 +98,7 @@ class Map:
         self.optimal_path, self.optimal_distance = self.astar()
 
     @staticmethod
-    def _create_graph(graph_file: str, default_file: str = 'complex_graph.json') -> nx.Graph:
+    def _create_graph(graph_file: str, default_file: str = 'map_graph.json') -> nx.Graph:
         """
         A static method that creates a connected graph used in the Map object by reading a cleaned json file.
 
