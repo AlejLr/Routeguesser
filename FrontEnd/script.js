@@ -60,7 +60,7 @@ function hideElement(element) {
 }
 
 function finishAnimation() {
-    // This function moves the animation to its final state, bu adjusting the title
+    // This function moves the animation to its final state, but adjusting the title
     // and showing and positioning the subtitle and the startGame button
 
     if (title) {

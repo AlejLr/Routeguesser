@@ -21,7 +21,7 @@
 }
 #title, #subtitle, #startGame {
     text-align: center;
-    margin: 10px 0; 
+    margin: auto; 
 }
 .hidden {
     display: none;
