@@ -202,8 +202,10 @@ def file_cleaner(in_file_name: str, out_file_name: str) -> None:
     while joiner(main_graph):
         continue
 
+    final_graph: nx.Graph = extract_main_component(main_graph)
+
     # Save the final graph data into json dictionary format
-    new_json: dict[str, list] = adjacency_data(main_graph, attrs={'id': 'id', 'key': 'key'})
+    new_json: dict[str, list] = adjacency_data(final_graph, attrs={'id': 'id', 'key': 'key'})
 
     # Write to the json destination
     with open(out_file_name, "w") as outfile:
