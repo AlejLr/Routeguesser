@@ -30,8 +30,8 @@ export {
     distance,
     blockedRoads,
     routeNumber,
-}; */
-
+}; 
+*/
 // Animations
 
 
@@ -331,7 +331,7 @@ function nextRound() {
     // If it is, the final score is calculated and the progress bar is shown
     // Otherwise, the progress bar is hidden and the next round starts
 
-    progressBarContainer.classList.add('hidden');
+    progressBarContainer.style.display = "none";
     currentRound++;
     if (currentRound === routesNum) {
         percentage = Math.round(100*(finalOptimalDistance/finalDistance));
