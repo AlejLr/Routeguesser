@@ -45,9 +45,9 @@ function startNewRound() {
     blockedRoadsFeatureGroup = L.featureGroup();
     blockedEdges = [];
 
-     // Add the start and end position of each blocked road to blockedEdges. In the easy and normal difficulties, also paint the blocked roads on the map
+     // Add the start and end position of each blocked road to blockedEdges. In the normal difficulty, also paint the blocked roads on the map
     for (blockedRoad of blockedRoads) {
-        if (difficulty != 100) {
+        if (difficulty == 50) {
             blockedRoadsFeatureGroup.addLayer(L.polyline(blockedRoad, {color: '#dd0000'}));
         }
         blockedEdges.push([blockedRoad[0], blockedRoad[blockedRoad.length-1]])
