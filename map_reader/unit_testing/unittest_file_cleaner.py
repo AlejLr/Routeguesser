@@ -1,5 +1,4 @@
 import unittest
-from file_cleaner import *
 import networkx as nx
 import json
 import os 
@@ -8,7 +7,7 @@ from matplotlib.pyplot import show
 
 # Add the map_reader directory path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
+from file_cleaner import *
 
 class TestFileCleaner(unittest.TestCase):
     def test_euclidean_dist(self):
@@ -137,11 +136,11 @@ class TestFileCleaner(unittest.TestCase):
     def test_geojson_converter(self):
         # Set values.
         expected_graph = nx.Graph()
-        expected_graph.add_edge((2, 4), (11, 4))
-        road = [(2, 4), (6, 4), (11, 4)]
-        expected_graph[(2, 4)][(11, 4)]['road'] = road
-        expected_graph[(2, 4)][(11, 4)]['dist'] = dist(road)
-        expected_graph[(2, 4)][(11, 4)]['blocked'] = False
+        expected_graph.add_edge((4, 2), (4, 11))
+        road = [(4, 2), (4, 6), (4, 11)]
+        expected_graph[(4, 2)][(4, 11)]['road'] = road
+        expected_graph[(4, 2)][(4, 11)]['dist'] = dist(road)
+        expected_graph[(4, 2)][(4, 11)]['blocked'] = False
         actual_graph = geojson_converter('file_cleaner_test_2.geojson')
 
         # Test cases:
