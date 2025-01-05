@@ -8,7 +8,7 @@ attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreet
 
 // Create circleIcon
 circleIcon = L.icon({
-    iconUrl: 'circle_icon.png',
+    iconUrl: 'circle_icon.webp',
     iconSize: [20, 20],
     iconAnchor: [10, 10],
     popupAnchor: [10, 10]
@@ -16,7 +16,7 @@ circleIcon = L.icon({
 
 // Create startIcon
 startIcon = L.icon({
-    iconUrl: 'start_marker_icon.png',
+    iconUrl: 'start_marker_icon.webp',
     iconSize: [32, 48],
     iconAnchor: [16, 48],
     popupAnchor:  [16, 48]
@@ -24,10 +24,18 @@ startIcon = L.icon({
 
 // Create endIcon
 endIcon = L.icon({
-    iconUrl: 'end_marker_icon.png',
+    iconUrl: 'end_marker_icon.webp',
     iconSize: [32, 48],
     iconAnchor: [16, 48],
     popupAnchor:  [16, 48]
+});
+
+// Create playerIcon
+playerIcon = L.icon({
+    iconUrl: 'player_icon.webp',
+    iconSize: [10, 10],
+    iconAnchor: [5, 5],
+    popupAnchor: [5, 5]
 });
 
 
@@ -57,6 +65,7 @@ function startNewRound() {
     pathLine = L.polyline(detailedPath, {color: '#2e80d1'}).addTo(map);
     currentPosition = start;
     neighbourMarkers = [];
+    playerMarker = L.marker([0,0]);
     requestNeighbours(start);
 
     // Set the view so the start and end nodes both on screen
@@ -77,7 +86,9 @@ function clearMap() {
 // This function creates markers that represent all the adjacent nodes (neighbours)
 function showNeighbours() {
     // Remove all the existing markers for neighbours
+    playerMarker.remove();
     neighbourMarkers.forEach(function(marker) {marker.remove()});
+    playerMarker = L.marker(currentPosition, {icon: playerIcon}).addTo(map).bindPopup("Current position");
     neighbourMarkers = [];
     let neighbourSubpaths = [];
 
@@ -128,6 +139,7 @@ function showNeighbours() {
                 if (e.latlng.equals(end)) {
                     optimalPathLine.addTo(map);
                     neighbourMarkers.forEach(function(marker) {marker.remove()});
+                    playerMarker.remove();
                     endRound();
                 }
                 // Otherwise, request neighbours for the new position
