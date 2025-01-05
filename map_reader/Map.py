@@ -4,11 +4,11 @@ import random
 import matplotlib.pyplot as plt
 from queue import PriorityQueue
 from networkx import adjacency_graph
-from os import path as fpath
 
 # DataType short-hands for readability
 Node = tuple[float, float]
 Road = list[Node]
+Corners = tuple[Node, Node]
 
 
 class Map:
@@ -24,7 +24,7 @@ class Map:
     :attr score (int): Current score.
     :attr start (Node): Starting position of current round.
     :attr end (Node): Ending position of current round.
-    :attr optimal_path (Road): Most optimal path from current round starting position to ending position according to A*.
+    :attr optimal_path (Road): Most optimal path from current round start position to end position according to A*.
     :attr optimal_distance (float): Distance from the starting position to the ending position using optimal path.
     :attr history (dict[Node, tuple[Node, float]]): Used in the A* algorithm to find optimal path.
     """
@@ -41,8 +41,10 @@ class Map:
         # Base and unchanging object variables
         self.serial: int = random.randint(0, 200)
 
-        self.Graph: nx.Graph = Map._create_graph(graph_file)
-
+        try:
+            self.Graph: nx.Graph = Map._create_graph(graph_file)
+        except Exception as e:
+            raise e
 
         # Values declared and reset in the game initiation
         self.number_of_blocked_roads: int = -1
@@ -94,24 +96,27 @@ class Map:
             raise ValueError("The file is not a json file")
 
         # Data collection and sorting
-        with open(graph_file) as f:
-            data: dict = json.load(f)  # Read the json data to fill the new graph object
+        try:
+            with open(graph_file) as f:
+                data: dict = json.load(f)  # Read the json data to fill the new graph object
+        except Exception as e:
+            raise e
 
-            # Tuples are not native json data types
-            # Therefore the coordinates in nodes and edges need to be transformed from lists to tuples
-            for node in data["nodes"]:
-                node["id"] = tuple(node["id"])
+        # Tuples are not native json data types
+        # Therefore the coordinates in nodes and edges need to be transformed from lists to tuples
+        for node in data["nodes"]:
+            node["id"] = tuple(node["id"])
 
-            for adj_list in data["adjacency"]:  # The adjacency (edge) list contains multiple lists,
-                for edge in adj_list:  # Each list contains a list of connections from a node
-                    edge["id"] = tuple(edge["id"])
-                    new_road = []
-                    for step in edge["road"]:  # Each node in the connection needs to be turned into a tuple
-                        new_road.append(tuple(step))
-                    edge["road"] = new_road
+        for adj_list in data["adjacency"]:  # The adjacency (edge) list contains multiple lists,
+            for edge in adj_list:  # Each list contains a list of connections from a node
+                edge["id"] = tuple(edge["id"])
+                new_road = []
+                for step in edge["road"]:  # Each node in the connection needs to be turned into a tuple
+                    new_road.append(tuple(step))
+                edge["road"] = new_road
 
-            # Create the graph using the data-type corrected data
-            graph: nx.Graph = adjacency_graph(data, directed=False, multigraph=False, attrs={'id': 'id', 'key': 'key'})
+        # Create the graph using the data-type corrected data
+        graph: nx.Graph = adjacency_graph(data, directed=False, multigraph=False, attrs={'id': 'id', 'key': 'key'})
 
         return graph
 
@@ -126,9 +131,9 @@ class Map:
         """
         # Basic local variables that help operate the method
         copy_g: nx.Graph = nx.Graph(self.Graph)  # A copy of the graph
-        possible_edges: list[tuple[Node]] = list(copy_g.edges())  # Possible removable road edges
+        possible_edges: list[Corners] = list(copy_g.edges())  # Possible removable road edges
         removable_roads: list[Road] = []  # List of blocked road paths
-        road_edges: list[tuple[Node]] = []  # List of tuples of nodes for start and end of road
+        road_edges: list[Corners] = []  # List of tuples of nodes for start and end of road
 
         # Try to block as many roads as possible till the goal is reached
         while len(road_edges) < number_of_blocked_nodes:
@@ -137,7 +142,7 @@ class Map:
                 break
 
             # Choose a random edge and remove it from the possibilities
-            try_remove: tuple[Node] = random.choice(possible_edges)
+            try_remove: Corners = random.choice(possible_edges)
             possible_edges.remove(try_remove)
 
             # Remove the edge from the graph copy and check if it remains connected, otherwise add it back to retry
@@ -163,7 +168,7 @@ class Map:
         """
         nx.set_edge_attributes(self.Graph, False, name="blocked")
 
-    def generate_start_end(self, min_distance: int = 100, theta: int = 1000) -> tuple[Node, Node]:
+    def generate_start_end(self, min_distance: int = 100, theta: int = 1000) -> Corners:
         """
         Generates a random tuple of start and end nodes, if they match the distance then they are returned, otherwise
         the distance factor is reduced until a valid pair is found.
@@ -215,7 +220,7 @@ class Map:
         finding algorithm. This function directly modifies the history variable thus a resetting is required every
         time the solver is run again.
 
-        :param priority_queue (PriorityQueue): The list of observed yet unvisited nodes in order of distance from origin.
+        :param priority_queue (PriorityQueue): List of observed yet unvisited nodes in order of distance from origin.
         :param end (Node): The end goal of the path.
         :param exclude_blocked (bool): A parameter to decide whether to exclude the blocked roads in the path finding.
 
@@ -306,6 +311,7 @@ class Map:
     def get_neighbours_and_roads(self, current: Node) -> list[tuple[Node, Road, float]]:
         """
         Finds all neighbors of a node in the graph, and combines those neighbors with the roads that lead to them.
+        Important note to remember is that tuples don't exist in json, therefore parse to tuple just in case.
 
         :param current (Node): The current node.
 
@@ -315,14 +321,13 @@ class Map:
         neighbour_and_roads: list[tuple[Node, Road, float]] = []
 
         neighbour: Node
-        current = tuple(current)
+        current: Node = tuple(current)
         for neighbour in list(self.Graph.neighbors(current)):
             edge: Road = Map.clean_edge(self.Graph[current][neighbour]["road"], current)
             distance: float = self.Graph[current][neighbour]["dist"] * 10000
             neighbour_and_roads.append((neighbour, edge, distance))
 
         return neighbour_and_roads
-
 
     @staticmethod
     def calculate_cartesian_distance(node1: Node, node2: Node) -> float:
@@ -337,7 +342,7 @@ class Map:
         return ((node1[0] - node2[0]) ** 2 + (node1[1] - node2[1]) ** 2)**0.5
 
     def __repr__(self):
-        """"
+        """
         Default string representation.
 
         :return (str): The basic information of current instance.
