@@ -1,4 +1,4 @@
-/* Game Explanation, also called "A piece of art" */
+/* Css for the animation */
 
 #gameExplanation {
     position: fixed;
@@ -20,10 +20,25 @@
     margin-bottom: 20px;
 }
 #title, #subtitle, #startGame {
-    width: 50%;
     text-align: center;
-    margin: 10 px 0; 
-    transform: translateX(50%);
+    margin: auto; 
+}
+#title {
+    font-size: 2.5em;
+    font-weight: bold;
+}
+#subtitle {
+    font-size: 1em;
+    margin-bottom: 20px;
+    text-align: justify;
+    max-width: 600px;
+}
+#startGame {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 50%;
 }
 .hidden {
     display: none;
