@@ -20,8 +20,10 @@
     margin-bottom: 20px;
 }
 #title, #subtitle, #startGame {
+    width: 50%;
     text-align: center;
-    margin: auto; 
+    margin: 10 px 0; 
+    transform: translateX(50%);
 }
 .hidden {
     display: none;
