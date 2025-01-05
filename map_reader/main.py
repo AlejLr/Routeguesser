@@ -50,9 +50,9 @@ def main() -> tuple[wrappers.Response, int]:
     data = request.get_json()
     
     if data["type"] == "start":
-        return send_start(data), 0
+        return send_start(data)
     elif data["type"] == "neighbours":
-        return send_neighbours(data), 0
+        return send_neighbours(data)
  
     
     return jsonify({"error" : "The data is not a JSON or the format is invalid"}), 400
