@@ -1,14 +1,12 @@
 import unittest
+from Map import Map
+import networkx as nx
 import sys
 import os
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
-
-from Map import Map
-
-import networkx as nx
 
 
 class TestMap(unittest.TestCase):
@@ -26,8 +24,6 @@ class TestMap(unittest.TestCase):
         # Define results
         result_1_1 = Map._create_graph("map_test_1-1.json")
         result_1_2 = Map._create_graph("map_test_1-2.json")
-
-
 
         # Test case 1: Basic usability
         with self.subTest(msg="1.1.1) Should return a networkx graph object."):
@@ -51,10 +47,8 @@ class TestMap(unittest.TestCase):
 
         # Test case 3: Invalid input file (go to default complex_json)
         with self.subTest(msg="1.3.1) Should return a networkx graph"):
-            with self.assertRaises(ValueError) as context:
+            with self.assertRaises(ValueError):
                 Map._create_graph("map_test_1-3.txt")
-
-
 
         del result_1_1
         del result_1_2
@@ -72,7 +66,6 @@ class TestMap(unittest.TestCase):
         test_map = Map('map_test_1-1.json')
         result_2_2 = test_map.generate_blocked_roads(2)
 
-
         # Test case 1: Fully connected graph
         with self.subTest(msg="2.1.1) Should return a list."):
             self.assertIsInstance(result_2_1, list)
@@ -86,9 +79,6 @@ class TestMap(unittest.TestCase):
             self.assertIsInstance(result_2_2, list)
         with self.subTest(msg="2.2.2) Should be an empty."):
             self.assertEqual(0, len(result_2_2))
-
-
-
 
         del result_2_1
         del result_2_2
@@ -119,7 +109,6 @@ class TestMap(unittest.TestCase):
         result_4_1 = test_map_4_1.generate_start_end()
         test_map_4_2 = Map("map_test_4-2.json")
 
-
         # Test case 1: Check if it works
         with self.subTest(msg="4.1.1) Should return a tuple of results."):
             self.assertIsInstance(result_4_1, tuple)
@@ -134,12 +123,12 @@ class TestMap(unittest.TestCase):
         with self.subTest(msg="4.2.1) Not enough nodes to generate start and end."):
             with self.assertRaises(Exception) as context:
                 test_map_4_2.generate_start_end()
-            self.assertEqual(str(context.exception), "Map does not have enough nodes to generate a starting and ending point.")
+            self.assertEqual(str(context.exception),
+                             "Map does not have enough nodes to generate a starting and ending point.")
         with self.subTest(msg="4.2.1) Not enough nodes."):
             with self.assertRaises(Exception) as context:
                 test_map_4_1.generate_start_end(min_distance=-5)
             self.assertEqual(str(context.exception), "Cannot have negative distance.")
-
 
         del result_4_1
         del test_map_4_1
@@ -155,8 +144,6 @@ class TestMap(unittest.TestCase):
         def reset(test_map_):
             test_map_.start = (0, 0)
             test_map_.end = (21, 0)
-            test_map_.current_pos = (0, 0)
-
             return test_map_.astar()
 
         test_map = Map("map_test_5-1.json")
@@ -193,7 +180,6 @@ class TestMap(unittest.TestCase):
         with self.subTest(msg="5.2.2) Path length should be correct."):
             self.assertAlmostEqual(226157.73105863907, result_5_2[1])
 
-
         del result_5_1
         del result_5_2
         del test_map
@@ -223,8 +209,6 @@ class TestMap(unittest.TestCase):
             self.assertTrue(all(isinstance(x, float | int) for x in result_6[0][1][0]))
         with self.subTest(msg="6.1.5) Third element should be a float."):
             self.assertIsInstance(result_6[0][2], float)
-
-
 
         del result_6
         del test_map
