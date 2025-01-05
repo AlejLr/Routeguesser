@@ -1,4 +1,3 @@
-export { startNewRound, clearMap, showNeighbours };
 
 // Initialise the map
 let map = L.map('map', {maxZoom: 18, minZoom:15, maxBounds: [[52.13, 4.455],[52.19, 4.53]], zoom: 15, center: [52.1581218,4.4855674]});

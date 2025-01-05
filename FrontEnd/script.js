@@ -21,14 +21,13 @@ export {
     updateDistance,
     endRound,
     showBar,
+    setRoutesNum,
+    setDistance,
     routesNum,
     difficulty,
     neighbours,
     distance,
     blockedRoads,
-    menu,
-    scoreText,
-    gameExplanation,
     routeNumber,
 };
 
@@ -254,7 +253,7 @@ function setDifficultyEasy() {
     // A difficulty value of 0 means there will be no blocked roads
 
     difficulty = 0;
-    menu.style.display = "none";
+    if (menu) menu.style.display = "none";
     initializeGame();
 }
 
@@ -263,7 +262,7 @@ function setDifficultyMedium() {
     // With a medium difficulty, the map will be generated with 50 blocked roads
 
     difficulty = 50;
-    menu.style.display = "none";
+    if (menu) menu.style.display = "none";
     initializeGame();
 }
 
@@ -272,7 +271,7 @@ function setDifficultyHard() {
     // Same functionality, 100 blocked roads 
 
     difficulty = 100;
-    menu.style.display = "none";
+    if (menu) menu.style.display = "none";
     initializeGame();
 }
 
@@ -298,6 +297,16 @@ function hideStartScreen() {
     gameExplanation.style.display = "none";
     distanceReset.style.display = "block";
     menu.style.display = "block";
+}
+
+// Setter function for routesNum
+function setRoutesNum(value) {
+    routesNum = value;
+}
+
+// Setter function for distance
+function setDistance(value) {
+    distance = value;
 }
 
 function updateRoutesNum() {
@@ -381,7 +390,7 @@ function updateDistance(addition) {
     // This function updates the distance by adding the length of the road traversed
 
     distance += parseFloat(addition);
-    scoreText.innerHTML = Math.round(distance).toString();
+    if(scoreText) scoreText.innerHTML = Math.round(distance).toString();
 }
 
 function endRound() {
