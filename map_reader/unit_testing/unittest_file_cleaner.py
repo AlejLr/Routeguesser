@@ -145,7 +145,7 @@ class TestFileCleaner(unittest.TestCase):
         actual_graph = geojson_converter('file_cleaner_test_2.geojson')
 
         # Test cases:
-        with self.subtTest(msg="7.1) Geojson file should be read correctly according to front-end requirements."):
+        with self.subTest(msg="7.1) Geojson file should be read correctly according to front-end requirements."):
             flag = (expected_graph.nodes == actual_graph.nodes and expected_graph.edges == actual_graph.edges)
             self.assertTrue(flag)
             del flag

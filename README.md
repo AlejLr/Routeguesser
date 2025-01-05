@@ -18,6 +18,11 @@ https://www.docker.com/products/docker-desktop/
 And scrolling down a bit. There you can select the download button and choose a version of Docker that is 
 compatible with your operating system. Then after downloading follow the instructions of the installer.
 
+To make the grading and testing process easier, we have created a temporary group related docker account with the following credentials:
+Username: group19ta
+Password: Password19TA!
+This account can be used directly if you don't already have a docker account or don't want to make one.
+
 ### Building the container
 You can build an image for the routeguesser application and run it by typing:
 `docker compose up --build`
