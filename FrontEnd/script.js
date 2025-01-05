@@ -1,3 +1,37 @@
+// Exporting functions so they can be used on the test
+
+export {
+    showElement,
+    hideElement,
+    finishAnimation,
+    runAnimations,
+    setupEventListeners,
+    setDifficultyEasy,
+    setDifficultyMedium,
+    setDifficultyHard,
+    resetGame,
+    hideStartScreen,
+    updateRoutesNum,
+    nextRound,
+    initializeFlask,
+    requestNeighbours,
+    finishGame,
+    initializeGame,
+    loadData,
+    updateDistance,
+    endRound,
+    showBar,
+    routesNum,
+    difficulty,
+    neighbours,
+    distance,
+    blockedRoads,
+    menu,
+    scoreText,
+    gameExplanation,
+    routeNumber,
+};
+
 // Animations
 
 
@@ -23,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     runAnimations();
+    setupEventListeners();
 });
 function addStartGameEventListener() {
     // This function adds an event listener to the start game button when the button
@@ -129,29 +164,30 @@ let start;
 
 // Initialization of the constant game variables, the elements from the html
 const scoreText = document.querySelector('#distanceText');
-const easyButton = document.querySelector('#easy');
-const mediumButton = document.querySelector('#medium');
-const hardButton = document.querySelector('#hard');
 const menu = document.querySelector('#menu');
 const routeNumber = document.querySelector('#routeNumber');
-const resetButton = document.querySelector('#reset');
 const distanceReset = document.querySelector('#distanceReset');
-const nextRoundButton = document.querySelector('#nextRoundButton');
 
 const playAgainButton = document.querySelector('#playAgainButton');
 const finalBarContainer = document.getElementById("finalBarContainer");
 
 // Adding event listeners to the buttons
-easyButton.onclick = setDifficultyEasy;
-mediumButton.onclick = setDifficultyMedium;
-hardButton.onclick = setDifficultyHard;
-resetButton.onclick = resetGame;
-nextRoundButton.onclick = nextRound;
-playAgainButton.onclick = finishGame;
-//startGame.onclick = hideStartScreen;
+function setupEventListeners() {
+    const easyButton = document.getElementById("easy");
+    const mediumButton = document.getElementById("medium");
+    const hardButton = document.getElementById("hard");
+    const resetButton = document.getElementById("reset");
+    const nextRoundButton = document.getElementById("nextRoundButton");
+    const playAgainButton = document.getElementById("playAgainButton");
 
-routeNumber.addEventListener('input', updateRoutesNum);
-
+    if (easyButton) easyButton.onclick = setDifficultyEasy;
+    if (mediumButton) mediumButton.onclick = setDifficultyMedium;
+    if (hardButton) hardButton.onclick = setDifficultyHard;
+    if (resetButton) resetButton.onclick = resetGame;
+    if (nextRoundButton) nextRoundButton.onclick = nextRound;
+    if (playAgainButton) playAgainButton.onclick = finishGame;
+    if(routeNumber) routeNumber.addEventListener('input', updateRoutesNum);
+}
 
 // Geting the information thorugh Flask
 
@@ -344,7 +380,6 @@ function updateDistance(addition) {
 
     // This function updates the distance by adding the length of the road traversed
 
-    console.log(addition, typeof(addition))
     distance += parseFloat(addition);
     scoreText.innerHTML = Math.round(distance).toString();
 }
@@ -371,9 +406,10 @@ function showBar(percentage, bar) {
     // The percentage is calculated and the color of the bar changes depending on the percentage
 
     // Variables for the elements of the progress bar
-    barContainer = document.getElementById(bar+"BarContainer");
-    barFill = document.getElementById(bar+"Fill");
-    barText = document.getElementById(bar+"Text");
+
+    const barContainer = document.getElementById(bar+"BarContainer");
+    const barFill = document.getElementById(bar+"Fill");
+    const barText = document.getElementById(bar+"Text");
 
     barContainer.style.display = 'block';
 

@@ -1,3 +1,5 @@
+export { startNewRound, clearMap, showNeighbours };
+
 // Initialise the map
 let map = L.map('map', {maxZoom: 18, minZoom:15, maxBounds: [[52.13, 4.455],[52.19, 4.53]], zoom: 15, center: [52.1581218,4.4855674]});
 
@@ -45,7 +47,7 @@ function startNewRound() {
     blockedRoadsFeatureGroup = L.featureGroup();
     blockedEdges = [];
 
-     // Add the start and end position of each blocked road to blockedEdges. In the normal difficulty, also paint the blocked roads on the map
+    // Add the start and end position of each blocked road to blockedEdges. In the normal difficulty, also paint the blocked roads on the map
     for (blockedRoad of blockedRoads) {
         if (difficulty == 50) {
             blockedRoadsFeatureGroup.addLayer(L.polyline(blockedRoad, {color: '#dd0000'}));
