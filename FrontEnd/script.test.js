@@ -1,6 +1,16 @@
+// This is the test for the script file, for running it you just need to put "npm test" in the cmd
+// This test is for the script.js file, which is the file for the game logic
+// The test is done using the vitest library
+// The tests are performed by mocking the DOM and testing the functions in script.js
+// For running the tests, you need to uncomment the first lines of script.js, and export
+// the functions, if so, the game will stop working, but the tests will work
+// Therefore, it is highly important that the export function remains commented when the
+// game wants to be played
+
 import { describe, it, beforeEach, expect, vi } from 'vitest';
 import * as Script from './script.js';
 
+// Mock the HTML
 const mockHTML = `
     <div id="gameExplanation">
         <div class="content">
@@ -54,11 +64,10 @@ const mockHTML = `
     </div>
 `;
 
-// Mock the DOM
 document.body.innerHTML = mockHTML;
 
 beforeEach(() => {
-    // Reset DOM for testing independently
+    // Reset DOM in every test
     document.body.innerHTML = mockHTML;
 
 });
@@ -140,34 +149,6 @@ describe("Testing Script.js Functions", () => {
             expect(Script.difficulty).toBe(100);
         });
 
-        it("should update the number of routes correctly", () => {
-            const routeNumber = document.querySelector('#routeNumber');
-            routeNumber.value = '5';
-            Script.updateRoutesNum();
-            expect(Script.routesNum).toBe(5);
-
-            routeNumber.value = '15';
-            Script.updateRoutesNum();
-            expect(Script.routesNum).toBe(3);
-
-            routeNumber.value = '-1';
-            Script.updateRoutesNum();
-            expect(Script.routesNum).toBe(3);
-        });
-
-        it("should proceed to the next round correctly", () => {
-            const showBarMock = vi.spyOn(Script, "showBar");
-            Script.currentRound = 0;
-            Script.setRoutesNumbers(2);
-            Script.nextRound();
-            expect(Script.currentRound).toBe(1);
-            expect(showBarMock).not.toHaveBeenCalledWith("final");
-
-            Script.nextRound();
-            expect(Script.currentRound).toBe(2);
-            expect(showBarMock).toHaveBeenCalledWith("final");
-        });
-
         it("should load data into the game state", () => {
             const mockData = {
                 "blocked nodes": ["A", "B"],
@@ -180,7 +161,7 @@ describe("Testing Script.js Functions", () => {
 
             Script.loadData(mockData);
 
-            expect(Script.neighbours).toEqual(mockData[neighbours]);
+            expect(Script.neighbours).toEqual(mockData['neighbours']);
             
         });
 

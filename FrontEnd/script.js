@@ -1,5 +1,6 @@
 // Exporting functions so they can be used on the test
 
+/*
 export {
     showElement,
     hideElement,
@@ -29,7 +30,7 @@ export {
     distance,
     blockedRoads,
     routeNumber,
-};
+}; */
 
 // Animations
 
@@ -166,7 +167,7 @@ const scoreText = document.querySelector('#distanceText');
 const menu = document.querySelector('#menu');
 const routeNumber = document.querySelector('#routeNumber');
 const distanceReset = document.querySelector('#distanceReset');
-
+const progressBarContainer = document.querySelector('#progressBarContainer');
 const playAgainButton = document.querySelector('#playAgainButton');
 const finalBarContainer = document.getElementById("finalBarContainer");
 
@@ -330,7 +331,7 @@ function nextRound() {
     // If it is, the final score is calculated and the progress bar is shown
     // Otherwise, the progress bar is hidden and the next round starts
 
-    barContainer.style.display = "none";
+    progressBarContainer.classList.add('hidden');
     currentRound++;
     if (currentRound === routesNum) {
         percentage = Math.round(100*(finalOptimalDistance/finalDistance));
