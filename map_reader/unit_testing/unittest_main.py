@@ -11,7 +11,7 @@ from main import app, send_start, send_neighbours, Map
 
 class TestMain(unittest.TestCase):
     def setUp(self):
-        self.game = Map("map_test_5-1.json")
+        self.game = Map("map_graph.json")
         self.app = app.test_client()
         self.app.testing = True
 
@@ -49,7 +49,7 @@ class TestMain(unittest.TestCase):
 
     def test_send_neighbours(self):
         with app.app_context():
-            data = {"current": (0, 0)}
+            data = {"current": list(self.game.Graph.nodes)[-1]}
             response = send_neighbours(data)
             self.assertEqual(response.status_code, 200)
             message = response.get_json()
@@ -72,7 +72,7 @@ class TestMain(unittest.TestCase):
             self.assertIn("start", message)
 
     def test_main_neighbours(self):
-        response = self.app.post('/main', json={"type": "neighbours", "current": (0, 0)})
+        response = self.app.post('/main', json={"type": "neighbours", "current": list(self.game.Graph.nodes)[-1]})
         self.assertEqual(response.status_code, 200)
         message = response.get_json()
 
