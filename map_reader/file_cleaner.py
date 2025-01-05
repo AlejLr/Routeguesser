@@ -1,7 +1,6 @@
-import json
-import geojson
-import networkx as nx
-from networkx import adjacency_data, Graph
+from json import dump
+from geojson import FeatureCollection, Feature, load
+from networkx import adjacency_data, Graph, connected_components
 from collections import defaultdict
 
 '''
@@ -39,11 +38,11 @@ def dist(points: Road) -> float:
     return sum(euclidean_dist(points[i], points[i + 1]) for i in range(len(points) - 1))
 
 
-def to_split(graph: nx.Graph) -> defaultdict[Corners, list[Road | set]]:
+def to_split(graph: Graph) -> defaultdict[Corners, list[Road | set]]:
     """
     Identify points where there is a node on the road and split the road into two parts to accurately reflect that.
 
-    :param graph (nx.Graph): The graph containing the nodes and edges that should be modified.
+    :param graph (Graph): The graph containing the nodes and edges that should be modified.
 
     :return (dict): Dictionary of edges to split with keys being edge corners and values being the road and nodes on it.
     """
@@ -69,17 +68,15 @@ def to_split(graph: nx.Graph) -> defaultdict[Corners, list[Road | set]]:
     return split
 
 
-def splitter(graph: nx.Graph, split: defaultdict[Corners, list[list | set]]) -> list[list[Road]]:
+def splitter(graph: Graph, split: defaultdict[Corners, list[list | set]]) -> None:
     """
     Split the edges identified in the to_split function into new edges and add the splitting point to the nodes.
 
-    :param graph (nx.Graph): The graph that contains the nodes and edges to be modified.
+    :param graph (Graph): The graph that contains the nodes and edges to be modified.
     :param split (dict): The dictionary of edges (Roads) to be split as well as the point (Node) to split at.
 
-    :return (list): A list of all newly added roads made by splitting existing edges.
+    :return (None):
     """
-    already_split: list[list[Road]] = []
-
     # Go over each edge in the graph that needs to be split
     edge: Corners
     for edge in split:
@@ -106,29 +103,27 @@ def splitter(graph: nx.Graph, split: defaultdict[Corners, list[list | set]]) -> 
         for new_road in new_roads:
             graph.add_edge(new_road[0], new_road[-1], dist=dist(new_road), road=new_road, blocked=False)
 
-        # Save the new roads
-        already_split.append(new_roads)
-
-    return already_split
+    # Remove the split edges
+    graph.remove_edges_from(split)
 
 
-def extract_main_component(graph: nx.Graph) -> nx.Graph:
+def extract_main_component(graph: Graph) -> Graph:
     """
     Deep copies the largest connected subgraph from the provided full graph.
 
-    :param graph (nx.Graph): The original full graph which can be a forest.
+    :param graph (Graph): The original full graph which can be a forest.
 
-    :return (nx.Graph): The main segment which can be the fullest tree.
+    :return (Graph): The main segment which can be the fullest tree.
     """
     # Sort the components by number of connected nodes
-    all_connected_components: list = sorted(nx.connected_components(graph), key=len, reverse=True)
+    all_connected_components: list = sorted(connected_components(graph), key=len, reverse=True)
     # Select the largest component, this is shared with the original graph
-    frozen_graph: nx.Graph = graph.subgraph(all_connected_components[0])
+    frozen_graph: Graph = graph.subgraph(all_connected_components[0])
     # Return an independent deep copy of the largest component
-    return nx.Graph(frozen_graph)
+    return Graph(frozen_graph)
 
 
-def joiner(graph: nx.Graph) -> bool:
+def joiner(graph: Graph) -> bool:
     """
     Loop over all nodes in the graph and join the separated roads that do not have intersections and remove the
     intermediate node. (L-turns are not valid player positions as they offer no value)
@@ -177,6 +172,44 @@ def joiner(graph: nx.Graph) -> bool:
         flag = True
 
     return flag
+
+
+def geojson_converter(in_file_name: str) -> Graph:
+    """
+    Function to extract the roads stored in the geojson file and transpose them into a Graph object.
+    IMPORTANT: The node coordinates are switched during this function.
+
+    :param in_file_name (str): The name of the geojson file containing the raw data.
+
+    :return (Graph): The graph containing a direct transposition of the geojson file content.
+    """
+    # Initialize Graph object
+    graph = Graph()
+
+    try:
+        with open(in_file_name, "r") as infile:
+            # Read the file data and prepare to process it
+            gjson: FeatureCollection = load(infile)
+            gjson_objs: list[Feature] = gjson["features"]
+    except Exception as e:
+        raise e
+
+    # Begin data processing
+    obj_dict: Feature
+    for obj_dict in gjson_objs:
+        # If it is a road, save the road coordinates into a list of edges
+        if obj_dict["geometry"]["type"] == 'LineString':
+            road: Road = [(y, x) for x, y in obj_dict["geometry"]["coordinates"]]
+            # Skip circular roads
+            if road[0] == road[-1]:
+                continue
+
+            # Add the edge to the graph
+            graph.add_edge(road[0], road[-1], dist=dist(road), road=road, blocked=False)
+
+    return graph
+
+
 def file_cleaner(in_file_name: str, out_file_name: str) -> None:
     """
     Function to clean the geojson file and write the clean data to the provided json file name.
@@ -187,65 +220,28 @@ def file_cleaner(in_file_name: str, out_file_name: str) -> None:
     :return (None):
     """
     # Open the geojson file and create a graph object
-    raw_graph: nx.Graph = geojson_converter(in_file_name)
+    raw_graph: Graph = geojson_converter(in_file_name)
 
     # Some roads are not connected to intermediate nodes. Split them into separate edges to connect them to the nodes.
     split: defaultdict[Corners, list[list | set]]
     while split := to_split(raw_graph):
         splitter(raw_graph, split)  # After removing, modify to match.
-        raw_graph.remove_edges_from(split)
         
     # Select the most optimal graph to work with (ensure connectivity)
-    main_graph: nx.Graph = extract_main_component(raw_graph)
+    main_graph: Graph = extract_main_component(raw_graph)
 
     # Join all continuous roads that do not offer real choice to the player (remove nodes of degree 2)
     while joiner(main_graph):
         continue
 
-    final_graph: nx.Graph = extract_main_component(main_graph)
+    final_graph: Graph = extract_main_component(main_graph)
 
     # Save the final graph data into json dictionary format
     new_json: dict[str, list] = adjacency_data(final_graph, attrs={'id': 'id', 'key': 'key'})
 
     # Write to the json destination
     with open(out_file_name, "w") as outfile:
-        json.dump(new_json, outfile)
-
-
-def geojson_converter(in_file_name: str) -> Graph:
-    """
-        Function to extract the roads stored in the geojson file and transpose them into a Graph object
-
-        :param in_file_name (str): The name of the geojson file containing the raw data.
-
-        :return (Graph): The graph containing a direct transposition of the geojson file content
-        """
-    # Initialize Graph object
-    graph = nx.Graph()
-
-    try:
-        with open(in_file_name, "r") as infile:
-            # Read the file data and prepare to process it
-            gjson: geojson.FeatureCollection = geojson.load(infile)
-            gjson_objs: list[geojson.Feature] = gjson["features"]
-    except Exception as e:
-        raise e
-
-    # Begin data processing
-    obj_dict: geojson.Feature
-    for obj_dict in gjson_objs:
-        # If it is a road, save the road coordinates into a list of edges
-        if obj_dict["geometry"]["type"] == 'LineString':
-            road: Road = [(y, x) for x, y in obj_dict["geometry"]["coordinates"]]
-            # Skip circular roads
-            if road[0] == road[-1]:
-                continue
-
-            # Add the edge to the graph
-            graph.add_edge(road[0], road[-1], dist=dist(road), road=road,
-                                blocked=False)
-
-    return graph
+        dump(new_json, outfile)
 
 
 if __name__ == '__main__':
