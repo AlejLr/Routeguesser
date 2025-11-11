@@ -1,4 +1,8 @@
 # RouteGuesser
+
+## New Live Demo!
+👉 [Play RouteGuesser](https://routeguesser-392262893051.europe-west1.run.app)
+
 ## Description
 This is the repository for the Routeguesser project. The game starts with two nodes on the map of Leiden: start and end, the objective for the user is to select edges that lead to the end node in such a way that they create an optimal path. Upon reaching the final node, the game displays in percentage the deviation between the user defined path, and the optimal path calculated by the astar algorithm. 
 The game also has three difficulty levels. The user can choose from easy, medium and hard difficulties. Easy level is the base game variation, without any changes. In medium mode we introduce random blocked roads on the map, which make it more difficult to reach the end, and finally in hard mode, the user cannot see the blocked edges, unless they bump directly into them.
