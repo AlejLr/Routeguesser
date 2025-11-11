@@ -198,7 +198,7 @@ async function initializeFlask() {
 
     const start = {"type": "start", "difficulty": difficulty}
     try{
-        const response = await fetch('http://127.0.0.1:5000/main',{
+        const response = await fetch('/api/main',{
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
@@ -225,7 +225,7 @@ async function requestNeighbours(coords) {
 
     const send_neighbours = {"type": "neighbours", "current": coords, "difficulty": difficulty}
     try{
-        const response = await fetch('http://127.0.0.1:5000/main',{
+        const response = await fetch('/api/main',{
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
